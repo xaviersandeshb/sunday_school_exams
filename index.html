@@ -624,11 +624,17 @@
                   placeholder:'Paste your GitHub token here',
                   className:'w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-red-500 mb-3'
                 }),
-                h('button', {
+               h('button', {
                   onClick:()=>{
                     if(githubToken.trim()){
                       saveGitHubToken(githubToken);
-                      alert('Token saved successfully! You can now upload exams.');
+                      // Force re-render by updating state
+                      setGithubToken(githubToken);
+                      console.log('Token saved:', githubToken.substring(0, 10) + '...');
+                      console.log('Token from storage:', getGitHubToken().substring(0, 10) + '...');
+                      alert('Token saved! Length: ' + githubToken.length);
+                    } else {
+                      alert('Please enter a token first!');
                     }
                   },
                   className:'w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700'
