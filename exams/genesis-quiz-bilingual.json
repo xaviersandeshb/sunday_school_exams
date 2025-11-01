@@ -1,0 +1,106 @@
+{
+  "examName": "Genesis Quiz - Bilingual",
+  "duration": 30,
+  "questions": [
+    {
+      "question": "Who was the first man created by God? / [translate:దేవుడు సృష్టించిన మొదటి మనిషి ఎవరు?]",
+      "options": [
+        "Moses / [translate:మోషే]",
+        "Adam / [translate:ఆదాము]",
+        "Noah / [translate:నోవహు]",
+        "Abraham / [translate:అబ్రాహాము]"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "How many days did God take to create the world? / [translate:దేవుడు ప్రపంచాన్ని సృష్టించడానికి ఎన్ని రోజులు పట్టింది?]",
+      "options": [
+        "5 days / [translate:5 రోజులు]",
+        "6 days / [translate:6 రోజులు]",
+        "7 days / [translate:7 రోజులు]",
+        "8 days / [translate:8 రోజులు]"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Who built the ark? / [translate:ఓడను ఎవరు నిర్మించారు?]",
+      "options": [
+        "Adam / [translate:ఆదాము]",
+        "Abraham / [translate:అబ్రాహాము]",
+        "Noah / [translate:నోవహు]",
+        "Moses / [translate:మోషే]"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What did God create on the first day? / [translate:దేవుడు మొదటి రోజు ఏమి సృష్టించాడు?]",
+      "options": [
+        "Animals / [translate:జంతువులు]",
+        "Light / [translate:వెలుగు]",
+        "Humans / [translate:మానవులు]",
+        "Plants / [translate:మొక్కలు]"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Who was the wife of Adam? / [translate:ఆదాము భార్య ఎవరు?]",
+      "options": [
+        "Sarah / [translate:సారా]",
+        "Rachel / [translate:రాహేలు]",
+        "Eve / [translate:ఏవ]",
+        "Rebecca / [translate:రిబేక్కా]"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What did God rest on the seventh day? / [translate:దేవుడు ఏడవ రోజున ఏమి చేశాడు?]",
+      "options": [
+        "Continued creating / [translate:సృష్టి కొనసాగించాడు]",
+        "Rested / [translate:విశ్రాంతి తీసుకున్నాడు]",
+        "Destroyed / [translate:నాశనం చేశాడు]",
+        "Slept / [translate:నిద్రపోయాడు]"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "How many sons did Noah have? / [translate:నోవహుకు ఎంత మంది కుమారులు ఉన్నారు?]",
+      "options": [
+        "2 sons / [translate:2 కుమారులు]",
+        "3 sons / [translate:3 కుమారులు]",
+        "4 sons / [translate:4 కుమారులు]",
+        "5 sons / [translate:5 కుమారులు]"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What sign did God give after the flood? / [translate:వరదల తర్వాత దేవుడు ఏ సంకేతం ఇచ్చాడు?]",
+      "options": [
+        "Star / [translate:నక్షత్రం]",
+        "Rainbow / [translate:ఇంద్రధనస్సు]",
+        "Cloud / [translate:మేఘం]",
+        "Lightning / [translate:మెరుపు]"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "From whose rib did God create Eve? / [translate:దేవుడు ఎవరి పక్కటెముక నుండి ఏవను సృష్టించాడు?]",
+      "options": [
+        "Noah's rib / [translate:నోవహు పక్కటెముక]",
+        "Adam's rib / [translate:ఆదాము పక్కటెముక]",
+        "Abraham's rib / [translate:అబ్రాహాము పక్కటెముక]",
+        "Moses' rib / [translate:మోషే పక్కటెముక]"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Where did God place Adam and Eve? / [translate:దేవుడు ఆదాము మరియు ఏవలను ఎక్కడ ఉంచాడు?]",
+      "options": [
+        "Desert / [translate:ఎడారి]",
+        "Mountain / [translate:పర్వతం]",
+        "Garden of Eden / [translate:ఏదెను తోట]",
+        "Ocean / [translate:సముద్రం]"
+      ],
+      "correct": 2
+    }
+  ]
+}
