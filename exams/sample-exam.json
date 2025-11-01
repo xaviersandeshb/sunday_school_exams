@@ -1,0 +1,16 @@
+{
+  "examName": "Sample Exam",
+  "duration": 30,
+  "questions": [
+    {
+      "question": "Who was the first man created by God?",
+      "options": ["Moses", "Adam", "Noah", "Abraham"],
+      "correct": 1
+    },
+    {
+      "question": "How many days did God take to create the world?",
+      "options": ["5 days", "6 days", "7 days", "8 days"],
+      "correct": 1
+    }
+  ]
+}
