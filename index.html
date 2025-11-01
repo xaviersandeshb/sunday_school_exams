@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
   <title>Sunday School Exam System</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -19,9 +21,19 @@
     const { useState, useEffect, useCallback, createElement: h } = React;
     const { createRoot } = ReactDOM;
 
+    // ===== GITHUB CONFIGURATION =====
+    // Replace these with your actual values
+    const GITHUB_CONFIG = {
+      username: 'xaviersandeshb',  // Replace with your GitHub username
+      repo: 'sunday_school_exams',
+      token: '',  // Replace with your personal access token
+      branch: 'main'
+    };
+
     function ExamSystem() {
       const [view, setView] = useState('login');
       const [studentName, setStudentName] = useState('');
+      const [examName, setExamName] = useState('');
       const [examData, setExamData] = useState(null);
       const [currentQuestion, setCurrentQuestion] = useState(0);
       const [answers, setAnswers] = useState({});
@@ -30,30 +42,24 @@
       const [allResults, setAllResults] = useState([]);
       const [isAdmin, setIsAdmin] = useState(false);
       const [isSpeaking, setIsSpeaking] = useState(false);
+      const [availableExams, setAvailableExams] = useState([]);
+      const [isUploading, setIsUploading] = useState(false);
       const adminPassword = 'admin123';
       const [passwordInput, setPasswordInput] = useState('');
 
-      // Load data from localStorage on mount
+      // Load results from localStorage
       useEffect(() => {
-        const loadData = () => {
-          try {
-            const examResult = localStorage.getItem('current-exam');
-            const resultsResult = localStorage.getItem('all-results');
-
-            if (examResult) {
-              setExamData(JSON.parse(examResult));
-            }
-            if (resultsResult) {
-              setAllResults(JSON.parse(resultsResult));
-            }
-          } catch (error) {
-            console.error('Error loading data:', error);
+        try {
+          const resultsResult = localStorage.getItem('all-results');
+          if (resultsResult) {
+            setAllResults(JSON.parse(resultsResult));
           }
-        };
-        loadData();
+        } catch (error) {
+          console.error('Error loading results:', error);
+        }
       }, []);
 
-      // Save results to localStorage whenever they change
+      // Save results to localStorage
       useEffect(() => {
         if (allResults.length > 0) {
           try {
@@ -63,6 +69,125 @@
           }
         }
       }, [allResults]);
+
+      // Fetch available exams from GitHub
+      const fetchAvailableExams = useCallback(async () => {
+        try {
+          const url = `https://api.github.com/repos/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/contents/exams?ref=${GITHUB_CONFIG.branch}`;
+          const response = await fetch(url);
+
+          if (response.ok) {
+            const files = await response.json();
+            const jsonFiles = files
+              .filter(file => file.name.endsWith('.json'))
+              .map(file => ({
+                name: file.name.replace('.json', ''),
+                downloadUrl: file.download_url
+              }));
+            setAvailableExams(jsonFiles);
+          }
+        } catch (error) {
+          console.error('Failed to fetch exams:', error);
+        }
+      }, []);
+
+      // Load exam from GitHub by name
+      // const loadExamFromGitHub = async (examFileName) => {
+      //   try {
+      //     const url = `https://raw.githubusercontent.com/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/exams/${examFileName}.json`;
+      //     const response = await fetch(url);
+
+      //     if (response.ok) {
+      //       const json = await response.json();
+      //       if (json.questions && json.questions.length > 0) {
+      //         setExamData(json);
+      //         return true;
+      //       }
+      //     }
+      //     return false;
+      //   } catch (error) {
+      //     console.error('Failed to load exam:', error);
+      //     return false;
+      //   }
+      // };
+      // Load exam from GitHub by name
+      const loadExamFromGitHub = async (examFileName) => {
+        try {
+          const url = `https://raw.githubusercontent.com/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/exams/${examFileName}.json`;
+          const response = await fetch(url);
+          
+          if (response.ok) {
+            const json = await response.json();
+            if (json.questions && json.questions.length > 0) {
+              setExamData(json);
+              return json; // Return the exam data instead of true
+            }
+          }
+          return null; // Return null instead of false
+        } catch (error) {
+          console.error('Failed to load exam:', error);
+          return null;
+        }
+      };
+
+      // Upload JSON file to GitHub
+      const uploadToGitHub = async (fileName, content) => {
+        try {
+          setIsUploading(true);
+
+          const url = `https://api.github.com/repos/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/contents/exams/${fileName}`;
+
+          // Check if file exists
+          let sha = null;
+          try {
+            const checkResponse = await fetch(url, {
+              headers: {
+                'Authorization': `token ${GITHUB_CONFIG.token}`
+              }
+            });
+            if (checkResponse.ok) {
+              const existingFile = await checkResponse.json();
+              sha = existingFile.sha;
+            }
+          } catch (e) {
+            // File doesn't exist, that's okay
+          }
+
+          const body = {
+            message: `${sha ? 'Update' : 'Add'} exam: ${fileName}`,
+            content: btoa(unescape(encodeURIComponent(content))),
+            branch: GITHUB_CONFIG.branch
+          };
+
+          if (sha) {
+            body.sha = sha;
+          }
+
+          const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `token ${GITHUB_CONFIG.token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+          });
+
+          setIsUploading(false);
+
+          if (response.ok) {
+            await fetchAvailableExams();
+            return true;
+          } else {
+            const error = await response.json();
+            console.error('GitHub API error:', error);
+            return false;
+          }
+        } catch (error) {
+          setIsUploading(false);
+          console.error('Upload error:', error);
+          return false;
+        }
+      };
 
       const speakQuestion = (text) => {
         if ('speechSynthesis' in window) {
@@ -83,12 +208,9 @@
           utterance.onerror = () => setIsSpeaking(false);
 
           window.speechSynthesis.speak(utterance);
-        } else {
-          alert('Text-to-speech is not supported in your browser.');
         }
       };
 
-      // Cleanup speech synthesis when question changes
       useEffect(() => {
         return () => {
           if ('speechSynthesis' in window) {
@@ -97,71 +219,109 @@
         };
       }, [currentQuestion]);
 
-      const handleLogin = (e) => {
+      const handleLogin = async (e) => {
         if (e) e.preventDefault();
-        if (studentName.trim()) {
-          if (studentName.toLowerCase() === 'admin') {
-            setView('admin-password');
-          } else {
-            if (!examData) {
-              alert('No exam is currently available. Please wait for the teacher to upload an exam.');
-              return;
-            }
-            setView('exam');
-            setTimeLeft(examData.duration * 60 || 1800);
-            setExamStarted(true);
-            setAnswers({});
-            setCurrentQuestion(0);
-          }
+
+        if (!studentName.trim()) {
+          alert('Please enter your name');
+          return;
         }
+
+        if (studentName.toLowerCase() === 'admin') {
+          setView('admin-password');
+          return;
+        }
+
+        // Student login - go to exam selection
+        setView('exam-selection');
       };
+
+      // const handleExamSelection = async (e) => {
+      //   if (e) e.preventDefault();
+
+      //   if (!examName.trim()) {
+      //     alert('Please enter exam name');
+      //     return;
+      //   }
+
+      //   const success = await loadExamFromGitHub(examName);
+
+      //   if (success) {
+      //     setView('exam');
+      //     setTimeLeft(examData.duration * 60 || 1800);
+      //     setExamStarted(true);
+      //     setAnswers({});
+      //     setCurrentQuestion(0);
+      //   } else {
+      //     alert(`Exam "${examName}" not found. Please check the exam name and try again.`);
+      //   }
+      // };
+
+    const handleExamSelection = async (e) => {
+      if (e) e.preventDefault();
+      
+      if (!examName.trim()) {
+        alert('Please enter exam name');
+        return;
+      }
+
+      const loadedExam = await loadExamFromGitHub(examName);
+      
+      if (loadedExam) {
+        // Use the returned exam data directly to set timer
+        const durationInSeconds = (loadedExam.duration || 30) * 60;
+        setTimeLeft(durationInSeconds);
+        setExamStarted(true);
+        setAnswers({});
+        setCurrentQuestion(0);
+        setView('exam');
+      } else {
+        alert(`Exam "${examName}" not found. Please check the exam name and try again.`);
+      }
+    };
+
 
       const handleAdminLogin = () => {
         if (passwordInput === adminPassword) {
           setIsAdmin(true);
           setView('admin');
           setPasswordInput('');
+          fetchAvailableExams();
         } else {
           alert('Incorrect password!');
         }
       };
 
-      const handleFileUpload = (e) => {
+      const handleFileUpload = async (e) => {
         const file = e.target.files[0];
         if (file) {
           const reader = new FileReader();
-          reader.onload = (event) => {
+          reader.onload = async (event) => {
             try {
-              const json = JSON.parse(event.target.result);
-              if (json.questions && json.questions.length > 0) {
-                setExamData(json);
-                try {
-                  localStorage.setItem('current-exam', JSON.stringify(json));
-                  alert(`Exam "${json.examName}" uploaded successfully! Students can now take the exam.`);
-                } catch (storageError) {
-                  console.error('Failed to save exam:', storageError);
-                  alert('Exam loaded but could not be saved. It will be lost on page refresh.');
-                }
-              } else {
+              const content = event.target.result;
+              const json = JSON.parse(content);
+
+              if (!json.examName || !json.questions || json.questions.length === 0) {
                 alert('Invalid JSON format. Please check your file.');
+                return;
+              }
+
+              // Create filename from exam name
+              const fileName = json.examName.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.json';
+
+              const success = await uploadToGitHub(fileName, content);
+
+              if (success) {
+                alert(`Exam "${json.examName}" uploaded successfully to GitHub!\nFilename: ${fileName}\nStudents can now access it.`);
+              } else {
+                alert('Failed to upload exam to GitHub. Please check your token and try again.');
               }
             } catch (error) {
               alert('Error reading file. Please upload a valid JSON file.');
+              console.error(error);
             }
           };
           reader.readAsText(file);
-        }
-      };
-
-      const clearExam = () => {
-        if (confirm('Are you sure you want to remove the current exam?')) {
-          setExamData(null);
-          try {
-            localStorage.removeItem('current-exam');
-            alert('Exam removed successfully!');
-          } catch (error) {
-            console.error('Failed to delete exam:', error);
-          }
         }
       };
 
@@ -230,7 +390,6 @@
         setView('results');
       }, [examData, studentName, allResults, answers]);
 
-      // Timer effect with proper dependencies
       useEffect(() => {
         if (examStarted && timeLeft > 0) {
           const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
@@ -255,7 +414,7 @@
           const worksheet = XLSX.utils.json_to_sheet(allResults);
           const workbook = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(workbook, worksheet, 'Results');
-          XLSX.writeFile(workbook, `${examData?.examName || 'Exam'}_Results.xlsx`);
+          XLSX.writeFile(workbook, `Sunday_School_Exam_Results.xlsx`);
         } catch (error) {
           console.error('Export error:', error);
           alert('Failed to export results. Please try again.');
@@ -271,6 +430,8 @@
       const resetApp = () => {
         setView('login');
         setStudentName('');
+        setExamName('');
+        setExamData(null);
         setCurrentQuestion(0);
         setAnswers({});
         setTimeLeft(0);
@@ -322,23 +483,21 @@
         trash: h('svg', {width:16,height:16,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2},
           h('polyline',{points:'3 6 5 6 21 6'}),
           h('path',{d:'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'})
+        ),
+        book: h('svg', {width:24,height:24,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2},
+          h('path',{d:'M4 19.5A2.5 2.5 0 0 1 6.5 17H20'}),
+          h('path',{d:'M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z'})
         )
       };
 
+      // LOGIN VIEW
       if (view === 'login') {
         return h('div', {className:'min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4'},
           h('div', {className:'bg-white rounded-2xl shadow-xl p-8 w-full max-w-md'},
             h('div', {className:'text-center mb-8'},
               h('div', {className:'bg-indigo-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4'}, icons.users),
               h('h1', {className:'text-3xl font-bold text-gray-800'}, 'Sunday School Exam'),
-              h('p', {className:'text-gray-600 mt-2'}, 'Enter your name to begin'),
-              examData && h('div', {className:'mt-4 bg-green-50 border border-green-200 rounded-lg p-3'},
-                h('p', {className:'text-sm text-green-800 font-semibold'}, '📝 Current Exam: ' + examData.examName),
-                h('p', {className:'text-xs text-green-600 mt-1'}, `${examData.questions.length} questions • ${examData.duration || 30} minutes`)
-              ),
-              !examData && h('div', {className:'mt-4 bg-yellow-50 border border-yellow-200 rounded-lg p-3'},
-                h('p', {className:'text-sm text-yellow-800'}, '⏳ No exam available yet. Please wait for teacher.')
-              )
+              h('p', {className:'text-gray-600 mt-2'}, 'Enter your name to begin')
             ),
             h('div', null,
               h('input', {
@@ -352,13 +511,50 @@
               h('button', {
                 onClick:handleLogin,
                 className:'w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition'
-              }, examData ? 'Start Exam' : 'Login')
+              }, 'Continue')
             ),
             h('p', {className:'text-sm text-gray-500 text-center mt-4'}, 'Type "admin" to access teacher dashboard')
           )
         );
       }
 
+      // EXAM SELECTION VIEW
+      if (view === 'exam-selection') {
+        return h('div', {className:'min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4'},
+          h('div', {className:'bg-white rounded-2xl shadow-xl p-8 w-full max-w-md'},
+            h('div', {className:'text-center mb-8'},
+              h('div', {className:'bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4'}, icons.book),
+              h('h2', {className:'text-2xl font-bold text-gray-800'}, 'Select Exam'),
+              h('p', {className:'text-gray-600 mt-2'}, 'Hello, ' + studentName + '!'),
+              h('p', {className:'text-sm text-gray-500 mt-1'}, 'Enter the exam name provided by your teacher')
+            ),
+            h('div', null,
+              h('input', {
+                type:'text',
+                value:examName,
+                onChange:(e)=>setExamName(e.target.value),
+                placeholder:'Exam Name (e.g., genesis-quiz)',
+                className:'w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-green-500 mb-4',
+                onKeyPress:(e)=>e.key==='Enter'&&handleExamSelection()
+              }),
+              h('button', {
+                onClick:handleExamSelection,
+                className:'w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition mb-2'
+              }, 'Start Exam'),
+              h('button', {
+                onClick:resetApp,
+                className:'w-full px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50'
+              }, 'Back')
+            ),
+            h('div', {className:'mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4'},
+              h('p', {className:'text-xs text-blue-800 font-semibold mb-2'}, '💡 Tip: Ask your teacher for the exam name'),
+              h('p', {className:'text-xs text-blue-600'}, 'Exam names are usually lowercase with dashes (e.g., genesis-quiz, hebrews-chapter-1)')
+            )
+          )
+        );
+      }
+
+      // ADMIN PASSWORD VIEW
       if (view === 'admin-password') {
         return h('div', {className:'min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4'},
           h('div', {className:'bg-white rounded-2xl shadow-xl p-8 w-full max-w-md'},
@@ -389,6 +585,7 @@
         );
       }
 
+      // ADMIN DASHBOARD
       if (view === 'admin' && isAdmin) {
         return h('div', {className:'min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4'},
           h('div', {className:'max-w-6xl mx-auto'},
@@ -397,34 +594,56 @@
                 h('h1', {className:'text-3xl font-bold text-gray-800'}, 'Teacher Dashboard'),
                 h('button', {onClick:resetApp,className:'px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600'}, 'Logout')
               ),
+
+              // Upload Section
               h('div', {className:'bg-blue-50 border-2 border-blue-200 rounded-xl p-6 mb-6'},
-                h('h2', {className:'text-xl font-bold text-gray-800 mb-4'}, '📚 Manage Exam'),
-                examData ? h('div', {className:'bg-white rounded-lg p-4 mb-4'},
-                  h('div', {className:'flex justify-between items-start'},
-                    h('div', null,
-                      h('p', {className:'font-semibold text-lg text-gray-800'}, examData.examName),
-                      h('p', {className:'text-sm text-gray-600 mt-1'}, `${examData.questions.length} questions • ${examData.duration || 30} minutes`)
-                    ),
-                    h('button', {onClick:clearExam,className:'flex items-center gap-2 px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200'},
-                      icons.trash, ' Remove'
-                    )
-                  )
-                ) : h('div', {className:'text-center py-4 mb-4'},
-                  h('p', {className:'text-gray-600'}, 'No exam uploaded yet')
-                ),
-                h('label', {className:'block'},
-                  h('div', {className:'flex items-center gap-2 mb-2'},
-                    icons.upload,
-                    h('span', {className:'font-semibold text-gray-700'}, 'Upload New Exam (JSON)')
+                h('h2', {className:'text-xl font-bold text-gray-800 mb-4'}, '📤 Upload Exam to GitHub'),
+                h('div', {className:'bg-white rounded-lg p-4 mb-4'},
+                  h('p', {className:'text-sm text-gray-600 mb-3'}, 'Upload a JSON file containing exam questions. It will be stored in GitHub for all students to access.'),
+                  isUploading && h('div', {className:'mb-3'},
+                    h('p', {className:'text-indigo-600 font-semibold'}, '⏳ Uploading to GitHub...')
                   ),
-                  h('input', {
-                    type:'file',
-                    accept:'.json',
-                    onChange:handleFileUpload,
-                    className:'block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer'
-                  })
+                  h('label', {className:'block'},
+                    h('div', {className:'flex items-center gap-2 mb-2'},
+                      icons.upload,
+                      h('span', {className:'font-semibold text-gray-700'}, 'Select Exam JSON File')
+                    ),
+                    h('input', {
+                      type:'file',
+                      accept:'.json',
+                      onChange:handleFileUpload,
+                      disabled:isUploading,
+                      className:'block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer disabled:opacity-50'
+                    })
+                  )
                 )
               ),
+
+              // Available Exams Section
+              availableExams.length > 0 && h('div', {className:'bg-purple-50 border-2 border-purple-200 rounded-xl p-6 mb-6'},
+                h('div', {className:'flex justify-between items-center mb-4'},
+                  h('h2', {className:'text-xl font-bold text-gray-800'}, '📚 Available Exams on GitHub'),
+                  h('button', {
+                    onClick:fetchAvailableExams,
+                    className:'px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200'
+                  }, '🔄 Refresh')
+                ),
+                h('div', {className:'bg-white rounded-lg p-4'},
+                  h('div', {className:'grid gap-2'},
+                    availableExams.map((exam, idx) =>
+                      h('div', {key:idx, className:'flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200'},
+                        h('div', null,
+                          h('p', {className:'font-semibold text-gray-800'}, exam.name),
+                          h('p', {className:'text-xs text-gray-500'}, 'Students should enter: ' + exam.name)
+                        ),
+                        h('span', {className:'text-green-600 text-sm'}, '✓ Available')
+                      )
+                    )
+                  )
+                )
+              ),
+
+              // Results Section
               h('div', {className:'bg-green-50 border-2 border-green-200 rounded-xl p-6'},
                 h('div', {className:'flex justify-between items-center mb-4'},
                   h('h2', {className:'text-xl font-bold text-gray-800'}, '📊 Student Results'),
@@ -476,12 +695,21 @@
                     )
                   )
                 )
+              ),
+
+              // GitHub Setup Info
+              h('div', {className:'mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4'},
+                h('p', {className:'text-xs text-yellow-800 font-semibold mb-2'}, '⚙️ GitHub Configuration'),
+                h('p', {className:'text-xs text-yellow-700'}, `Repository: ${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}`),
+                h('p', {className:'text-xs text-yellow-700'}, `Branch: ${GITHUB_CONFIG.branch}`),
+                h('p', {className:'text-xs text-yellow-700 mt-2'}, GITHUB_CONFIG.token === 'YOUR_GITHUB_TOKEN_HERE' ? '⚠️ Warning: Please add your GitHub token in the HTML file!' : '✓ Token configured')
               )
             )
           )
         );
       }
 
+      // EXAM VIEW
       if (view === 'exam' && examData) {
         const question = examData.questions[currentQuestion];
         const progress = ((currentQuestion + 1) / examData.questions.length) * 100;
@@ -546,6 +774,7 @@
         );
       }
 
+      // RESULTS VIEW
       if (view === 'results') {
         const result = calculateScore();
         const myResult = allResults.find(r => 
