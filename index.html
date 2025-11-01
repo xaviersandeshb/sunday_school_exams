@@ -590,11 +590,34 @@
         return h('div', {className:'min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4'},
           h('div', {className:'max-w-6xl mx-auto'},
             h('div', {className:'bg-white rounded-2xl shadow-xl p-8'},
+              // Header Section
               h('div', {className:'flex justify-between items-center mb-6'},
                 h('h1', {className:'text-3xl font-bold text-gray-800'}, 'Teacher Dashboard'),
                 h('button', {onClick:resetApp,className:'px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600'}, 'Logout')
               ),
 
+              // Token Setup Section (MOVED OUTSIDE HEADER)
+              !githubToken && h('div', {className:'bg-red-50 border-2 border-red-200 rounded-xl p-6 mb-6'},
+                h('h2', {className:'text-xl font-bold text-red-800 mb-4'}, '🔐 GitHub Token Required'),
+                h('p', {className:'text-sm text-gray-700 mb-4'}, 'To upload exams to GitHub, you need to enter your Personal Access Token once. It will be saved securely in your browser.'),
+                h('input', {
+                  type:'password',
+                  value:githubToken,
+                  onChange:(e)=>setGithubToken(e.target.value),
+                  placeholder:'Paste your GitHub token here',
+                  className:'w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-red-500 mb-3'
+                }),
+                h('button', {
+                  onClick:()=>{
+                    if(githubToken.trim()){
+                      setGitHubToken(githubToken);
+                      alert('Token saved successfully! You can now upload exams.');
+                    }
+                  },
+                  className:'w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700'
+                }, 'Save Token')
+              ),
+              
               // Upload Section
               h('div', {className:'bg-blue-50 border-2 border-blue-200 rounded-xl p-6 mb-6'},
                 h('h2', {className:'text-xl font-bold text-gray-800 mb-4'}, '📤 Upload Exam to GitHub'),
@@ -642,7 +665,7 @@
                   )
                 )
               ),
-
+              
               // Results Section
               h('div', {className:'bg-green-50 border-2 border-green-200 rounded-xl p-6'},
                 h('div', {className:'flex justify-between items-center mb-4'},
@@ -702,7 +725,7 @@
                 h('p', {className:'text-xs text-yellow-800 font-semibold mb-2'}, '⚙️ GitHub Configuration'),
                 h('p', {className:'text-xs text-yellow-700'}, `Repository: ${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}`),
                 h('p', {className:'text-xs text-yellow-700'}, `Branch: ${GITHUB_CONFIG.branch}`),
-                h('p', {className:'text-xs text-yellow-700 mt-2'}, GITHUB_CONFIG.token === 'YOUR_GITHUB_TOKEN_HERE' ? '⚠️ Warning: Please add your GitHub token in the HTML file!' : '✓ Token configured')
+                h('p', {className:'text-xs text-yellow-700 mt-2'}, githubToken ? '✓ Token configured' : '⚠️ Please enter your GitHub token above')
               )
             )
           )
