@@ -150,6 +150,26 @@
       // Upload JSON file to GitHub
       const uploadToGitHub = async (fileName, content) => {
         try {
+          // Get token from BOTH state and localStorage
+          let token = githubToken || getGitHubToken();
+          
+          // Check if token exists
+          if (!token || token.trim() === '') {
+            alert('❌ GitHub token is missing!\n\nPlease enter your GitHub Personal Access Token in the red box above, then click "Save Token".');
+            return false;
+          }
+          
+          token = token.trim();
+          
+          // Validate token format
+          if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) {
+            alert('❌ Invalid token format!\n\nGitHub tokens should start with "ghp_" or "github_pat_"\n\nPlease check your token and try again.');
+            return false;
+          }
+          
+          console.log('✓ Using token:', token.substring(0, 15) + '...');
+          console.log('✓ Uploading to:', `${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/exams/${fileName}`);
+          
           setIsUploading(true);
 
           const url = `https://api.github.com/repos/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/contents/exams/${fileName}`;
@@ -159,15 +179,22 @@
           try {
             const checkResponse = await fetch(url, {
               headers: {
-                'Authorization': `token ${getGitHubToken()}`
+                'Authorization': `token ${token}`,
+                'Accept': 'application/vnd.github.v3+json'
               }
             });
+            
             if (checkResponse.ok) {
               const existingFile = await checkResponse.json();
               sha = existingFile.sha;
+              console.log('✓ File exists, will update');
+            } else if (checkResponse.status === 404) {
+              console.log('✓ File does not exist, will create new');
+            } else {
+              console.warn('Check file returned:', checkResponse.status);
             }
           } catch (e) {
-            // File doesn't exist, that's okay
+            console.log('File check (expected if new):', e.message);
           }
 
           const body = {
@@ -183,8 +210,9 @@
           const response = await fetch(url, {
             method: 'PUT',
             headers: {
-              'Authorization': `token ${getGitHubToken()}`,
-              'Content-Type': 'application/json'
+              'Authorization': `token ${token}`,
+              'Content-Type': 'application/json',
+              'Accept': 'application/vnd.github.v3+json'
             },
             body: JSON.stringify(body)
           });
@@ -192,20 +220,36 @@
           setIsUploading(false);
 
           if (response.ok) {
+            console.log('✓ Upload successful!');
             await fetchAvailableExams();
             return true;
           } else {
             const error = await response.json();
-            console.error('GitHub API error:', error);
+            console.error('❌ GitHub API error:', error);
+            
+            // Show specific error message
+            let errorMessage = '';
+            if (response.status === 401) {
+              errorMessage = '❌ Authentication Failed!\n\nYour token is invalid or expired.\n\nPlease:\n1. Go to github.com/settings/tokens\n2. Generate a new token with "repo" permission\n3. Paste it in the red box above\n4. Click "Save Token"';
+            } else if (response.status === 403) {
+              errorMessage = '❌ Permission Denied!\n\nYour token does not have permission to write to this repository.\n\nPlease:\n1. Go to github.com/settings/tokens\n2. Make sure your token has "repo" scope checked ✓\n3. Or generate a new token with full "repo" access';
+            } else if (response.status === 404) {
+              errorMessage = '❌ Repository Not Found!\n\nCannot find: ' + GITHUB_CONFIG.username + '/' + GITHUB_CONFIG.repo + '\n\nPlease check:\n1. Username is correct: ' + GITHUB_CONFIG.username + '\n2. Repository name is correct: ' + GITHUB_CONFIG.repo + '\n3. Repository exists and is public';
+            } else {
+              errorMessage = '❌ Upload Failed!\n\nError: ' + (error.message || 'Unknown error') + '\nStatus: ' + response.status;
+            }
+            
+            alert(errorMessage);
             return false;
           }
         } catch (error) {
           setIsUploading(false);
-          console.error('Upload error:', error);
+          console.error('❌ Upload error:', error);
+          alert('❌ Upload Error!\n\n' + error.message + '\n\nCheck browser console (F12) for details.');
           return false;
         }
       };
-
+ 
       const speakQuestion = (text) => {
         if ('speechSynthesis' in window) {
           window.speechSynthesis.cancel();
@@ -614,33 +658,45 @@
               ),
 
               // Token Setup Section (MOVED OUTSIDE HEADER)
-              !githubToken && h('div', {className:'bg-red-50 border-2 border-red-200 rounded-xl p-6 mb-6'},
+
+              // Token Setup Section - FIXED VERSION
+              (!githubToken || githubToken === '') && h('div', {className:'bg-red-50 border-2 border-red-200 rounded-xl p-6 mb-6'},
                 h('h2', {className:'text-xl font-bold text-red-800 mb-4'}, '🔐 GitHub Token Required'),
                 h('p', {className:'text-sm text-gray-700 mb-4'}, 'To upload exams to GitHub, you need to enter your Personal Access Token once. It will be saved securely in your browser.'),
                 h('input', {
                   type:'password',
                   value:githubToken,
                   onChange:(e)=>setGithubToken(e.target.value),
-                  placeholder:'Paste your GitHub token here',
+                  placeholder:'Paste your GitHub token here (starts with ghp_)',
                   className:'w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-red-500 mb-3'
                 }),
-               h('button', {
+                h('button', {
                   onClick:()=>{
-                    if(githubToken.trim()){
-                      saveGitHubToken(githubToken);
-                      // Force re-render by updating state
-                      setGithubToken(githubToken);
-                      console.log('Token saved:', githubToken.substring(0, 10) + '...');
-                      console.log('Token from storage:', getGitHubToken().substring(0, 10) + '...');
-                      alert('Token saved! Length: ' + githubToken.length);
+                    const token = githubToken.trim();
+                    if(!token){
+                      alert('Please paste your GitHub token first!');
+                      return;
+                    }
+                    if(!token.startsWith('ghp_') && !token.startsWith('github_pat_')){
+                      alert('Invalid token format! GitHub tokens start with "ghp_" or "github_pat_"');
+                      return;
+                    }
+                    // Save to localStorage
+                    saveGitHubToken(token);
+                    // Update state to force re-render
+                    setGithubToken(token);
+                    // Verify it was saved
+                    const savedToken = getGitHubToken();
+                    if(savedToken === token){
+                      alert('✓ Token saved successfully!\n\nYou can now upload exam files.\n\nToken length: ' + token.length + ' characters');
                     } else {
-                      alert('Please enter a token first!');
+                      alert('❌ Failed to save token. Please try again.');
                     }
                   },
                   className:'w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700'
                 }, 'Save Token')
               ),
-              
+
               // Upload Section
               h('div', {className:'bg-blue-50 border-2 border-blue-200 rounded-xl p-6 mb-6'},
                 h('h2', {className:'text-xl font-bold text-gray-800 mb-4'}, '📤 Upload Exam to GitHub'),
