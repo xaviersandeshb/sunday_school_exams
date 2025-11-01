@@ -1,0 +1,31 @@
+{
+  "examName": "Genesis Knowledge Test - Creation & Patriarchs",
+  "duration": 15,
+  "questions": [
+    {
+      "question": "On which day did God create human beings?",
+      "options": ["Day 5", "Day 6", "Day 7", "Day 4"],
+      "correct": 1
+    },
+    {
+      "question": "What was the name of Abraham's wife?",
+      "options": ["Rachel", "Leah", "Sarah", "Rebecca"],
+      "correct": 2
+    },
+    {
+      "question": "How many sons did Jacob have?",
+      "options": ["10 sons", "11 sons", "12 sons", "13 sons"],
+      "correct": 2
+    },
+    {
+      "question": "What did God create on the first day?",
+      "options": ["Animals", "Light", "Plants", "Sky"],
+      "correct": 1
+    },
+    {
+      "question": "Which son did Abraham almost sacrifice to God?",
+      "options": ["Ishmael", "Isaac", "Jacob", "Joseph"],
+      "correct": 1
+    }
+  ]
+}
