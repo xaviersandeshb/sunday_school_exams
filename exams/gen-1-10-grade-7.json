@@ -1,0 +1,407 @@
+{
+  "examName": "gen-1-10-grade-7",
+  "duration": 60,
+  "totalQuestions": 40,
+  "questions": [
+    {
+      "question": "On which day of creation were the sun, moon, and stars made? / సృష్టిలో ఏ రోజున సూర్యుడు, చంద్రుడు మరియు నక్షత్రాలు సృష్టించబడ్డాయి?",
+      "options": [
+        "First day / మొదటి రోజు",
+        "Third day / మూడవ రోజు",
+        "Fourth day / నాల్గవ రోజు",
+        "Sixth day / ఆరవ రోజు"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "God created mankind 'in his own ____.' / దేవుడు మానవాళిని 'తన ____లో' సృష్టించాడు.",
+      "options": [
+        "house / ఇంటి",
+        "garden / తోట",
+        "image / స్వరూపమందు",
+        "boat / పడవ"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What specific punishment was given to the serpent? / సర్పానికి ఏ ప్రత్యేక శిక్ష విధించబడింది?",
+      "options": [
+        "It would lose its ability to speak / అది మాట్లాడే సామర్థ్యాన్ని కోల్పోతుంది",
+        "It would have to crawl on its belly / అది తన కడుపుతో ప్రాకవలెను",
+        "It would be sent away forever / అది శాశ్వతంగా పంపబడుతుంది",
+        "Its color would be changed / దాని రంగు మార్చబడుతుంది"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What was Adam's curse for his disobedience? / ఆదాము అవిధేయతకు అతని శాపం ఏమిటి?",
+      "options": [
+        "He would lose his memory / అతను తన జ్ఞాపకశక్తిని కోల్పోతాడు",
+        "He would have to work the ground for food / అతను ఆహారం కోసం నేలను సేద్యపరచాలి",
+        "He could no longer talk to animals / అతను జంతువులతో మాట్లాడలేడు",
+        "He would have to build a new garden / అతను కొత్త తోటను నిర్మించాలి"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Who was Adam and Eve's third son, whose name means 'appointed'? / 'నియమించబడిన' అని అర్థం వచ్చే ఆదాము మరియు హవ్వల మూడవ కుమారుడు ఎవరు?",
+      "options": [
+        "Enoch / హనోకు",
+        "Lamech / లెమెకు",
+        "Seth / షేతు",
+        "Jared / యెరెదు"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Who was the oldest man in the Bible, living 969 years? / బైబిల్‌లో 969 సంవత్సరాలు జీవించిన అత్యంత వృద్ధుడు ఎవరు?",
+      "options": [
+        "Noah / నోవహు",
+        "Adam / ఆదాము",
+        "Enoch / హనోకు",
+        "Methuselah / మెతూషెల"
+      ],
+      "correct": 3
+    },
+    {
+      "question": "Which man 'walked with God, and then he was no more'? / ఏ వ్యక్తి 'దేవునితో నడిచాడు, ఆ తర్వాత అతడు లేకపోయెను'?",
+      "options": [
+        "Abel / హేబెలు",
+        "Enoch / హనోకు",
+        "Noah / నోవహు",
+        "Lamech / లెమెకు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What kind of wood was the ark built from? / ఓడ ఏ రకమైన కొయ్యతో నిర్మించబడింది?",
+      "options": [
+        "Oak / ఓక్",
+        "Gopher wood / చితిసారకపు మ్రాను",
+        "Pine / పైన్",
+        "Cedar / దేవదారు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "On which mountains did Noah's ark come to rest? / నోవహు ఓడ ఏ పర్వతాలపై నిలిచింది?",
+      "options": [
+        "The mountains of Ararat / అరారాతు పర్వతాలు",
+        "The Alps / ఆల్ప్స్",
+        "The Himalayas / హిమాలయాలు",
+        "Mount Sinai / సీనాయి పర్వతం"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "What was the first thing Noah did after leaving the ark? / ఓడ నుండి బయటకు వచ్చిన తర్వాత నోవహు చేసిన మొదటి పని ఏమిటి?",
+      "options": [
+        "He planted a vineyard / అతను ఒక ద్రాక్షతోటను నాటాడు",
+        "He built an altar to the Lord / అతను యెహోవాకు బలిపీఠాన్ని కట్టాడు",
+        "He built a house / అతను ఒక ఇల్లు కట్టాడు",
+        "He went for a walk / అతను నడకకు వెళ్ళాడు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "After the flood, God gave Noah's family new permission to eat what? / జలప్రళయం తర్వాత, నోవహు కుటుంబానికి దేవుడు ఏమి తినడానికి కొత్త అనుమతి ఇచ్చాడు?",
+      "options": [
+        "Only plants / కేవలం మొక్కలు",
+        "Only fish / కేవలం చేపలు",
+        "Animals, in addition to plants / మొక్కలతో పాటు జంతువులు",
+        "Nothing with salt / ఉప్పుతో ఉన్నది ఏదీ కాదు"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Which of Noah's sons disrespected his father by looking at him uncovered? / నోవహు కుమారులలో ఎవరు తన తండ్రి వస్త్రహీనుడైయుండుట చూసి ఆయనను అగౌరవపరిచాడు?",
+      "options": [
+        "Shem / షేము",
+        "Japheth / యాపెతు",
+        "Ham / హాము",
+        "Seth / షేతు"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Noah pronounced a curse on Canaan. Who was Canaan's father? / నోవహు కనానును శపించాడు. కనాను తండ్రి ఎవరు?",
+      "options": [
+        "Shem / షేము",
+        "Japheth / యాపెతు",
+        "Ham / హాము",
+        "Noah / నోవహు"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "From which of Noah's sons are the Israelites descended? / ఇశ్రాయేలీయులు నోవహు ఏ కుమారుని సంతతివారు?",
+      "options": [
+        "Ham / హాము",
+        "Japheth / యాపెతు",
+        "Shem / షేము",
+        "Cain / కయీను"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "The name 'Babel' sounds like the Hebrew word for ____. / 'బాబెలు' అనే పేరు హిబ్రూ భాషలో ____ అనే పదము వలె ధ్వనిస్తుంది.",
+      "options": [
+        "tall / పొడవు",
+        "confused / తారుమారు",
+        "united / ఐక్యత",
+        "brick / ఇటుక"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Who was the 'mighty hunter before the LORD' who founded Babel? / బాబెలును స్థాపించిన, 'యెహోవా యెదుట పరాక్రమముగల వేటగాడు' ఎవరు?",
+      "options": [
+        "Eber / ఏబెరు",
+        "Nimrod / నిమ్రోదు",
+        "Asshur / అష్షూరు",
+        "Peleg / పెలెగు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What did the builders of the Tower of Babel use for mortar? / బాబెలు గోపురము కట్టేవారు అడుసు కొరకు ఏమి ఉపయోగించారు?",
+      "options": [
+        "Clay / బంకమన్ను",
+        "Tar / మట్టికీలు",
+        "Cement / సిమెంట్",
+        "Sand / ఇసుక"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Cain was a 'tiller of the ground,' which means he was a ____. / కయీను 'భూమిని సేద్యపరచువాడు,' అనగా అతడు ఒక ____.",
+      "options": [
+        "Shepherd / కాపరి",
+        "Farmer / రైతు",
+        "Builder / నిర్మాణకుడు",
+        "Hunter / వేటగాడు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What offering did Cain bring to the Lord? / కయీను యెహోవాకు ఏ అర్పణను తెచ్చాడు?",
+      "options": [
+        "The firstborn of his flock / తన మందలో తొలిచూలు",
+        "Some of the fruit of the soil / భూమి పంటలో కొంత",
+        "A jar of oil / ఒక జాడీ నూనె",
+        "A handmade craft / ఒక చేతిపని వస్తువు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "God's covenant with Noah was a promise made to ____. / నోవహుతో దేవుని నిబంధన ____కి చేయబడిన వాగ్దానం.",
+      "options": [
+        "only Noah's family / కేవలం నోవహు కుటుంబానికి",
+        "only the people of Israel / కేవలం ఇశ్రాయేలు ప్రజలకు",
+        "all living creatures / సకల జీవరాశులకు",
+        "only the animals on the ark / కేవలం ఓడలోని జంతువులకు"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Genesis 1:2 describes the early earth as 'formless and empty' and darkness over the surface of the ____. / ఆదికాండము 1:2 ప్రారంభ భూమిని 'నిరాకారముగాను శూన్యముగాను' మరియు ____ ఉపరితలంపై చీకటిగా వర్ణిస్తుంది.",
+      "options": [
+        "desert / ఎడారి",
+        "deep / అగాధజలము",
+        "mountains / పర్వతాలు",
+        "sun / సూర్యుడు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "To guard the way to the Tree of Life, what did God place east of the Garden of Eden? / జీవ వృక్షమునకు పోవు మార్గమును కాచుటకు, దేవుడు ఏదెను తోటకు తూర్పున ఏమి ఉంచాడు?",
+      "options": [
+        "A great wall and a deep river / ఒక గొప్ప గోడ మరియు లోతైన నది",
+        "A sleeping giant / నిద్రిస్తున్న ఒక రాక్షసుడు",
+        "A maze of thorns / ముళ్ళ కంచె",
+        "Cherubim and a flaming sword / కెరూబులను, ఖడ్గజ్వాలను"
+      ],
+      "correct": 3
+    },
+    {
+      "question": "When God asked Cain where his brother was, what was Cain's famous reply? / దేవుడు కయీనును నీ సహోదరుడు ఎక్కడ అని అడిగినప్పుడు, కయీను ప్రసిద్ధ సమాధానం ఏమిటి?",
+      "options": [
+        "'He has gone for a walk.' / 'అతడు నడకకు వెళ్ళాడు.'",
+        "'Am I my brother's keeper?' / 'నేను నా సహోదరునికి కావలివాడనా?'",
+        "'He is hiding from you.' / 'అతడు నీ నుండి దాక్కుంటున్నాడు.'",
+        "'Ask the serpent.' / 'సర్పాన్ని అడగండి.'"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What was the purpose of the mark God put on Cain? / దేవుడు కయీనుపై ఉంచిన గుర్తు యొక్క ఉద్దేశ్యం ఏమిటి?",
+      "options": [
+        "To show everyone his guilt / అందరికీ అతని అపరాధాన్ని చూపించడానికి",
+        "To cause him pain / అతనికి నొప్పి కలిగించడానికి",
+        "To prevent anyone from killing him / ఎవరూ అతన్ని చంపకుండా నిరోధించడానికి",
+        "To make him forget / అతను మరచిపోయేలా చేయడానికి"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "A descendant of Cain who boasted about killing a man was ____. / ఒక మనిషిని చంపడం గురించి గొప్పలు చెప్పుకున్న కయీను వంశస్థుడు ____.",
+      "options": [
+        "Enoch / హనోకు",
+        "Jared / యెరెదు",
+        "Lamech / లెమెకు",
+        "Methuselah / మెతూషెల"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Genesis 6 says Noah found ____ in the eyes of the Lord. / ఆదికాండము 6వ అధ్యాయం ప్రకారం, నోవహు యెహోవా దృష్టిలో ____ పొందాడు.",
+      "options": [
+        "wealth / సంపదను",
+        "grace / కృపను",
+        "knowledge / జ్ఞానాన్ని",
+        "strength / బలాన్ని"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Exactly how many people were saved on Noah's ark? / నోవహు ఓడలో సరిగ్గా ఎంత మంది రక్షించబడ్డారు?",
+      "options": [
+        "Two / ఇద్దరు",
+        "Four / నలుగురు",
+        "Eight / ఎనిమిది మంది",
+        "Twelve / పన్నెండు మంది"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "A covenant is best described as a sacred ____. / నిబంధనను పవిత్రమైన ____గా ఉత్తమంగా వర్ణించవచ్చు.",
+      "options": [
+        "law / చట్టం",
+        "story / కథ",
+        "agreement or promise / ఒప్పందం లేదా వాగ్దానం",
+        "building / భవనం"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What two materials did the people use to build the Tower of Babel? / బాబెలు గోపురాన్ని నిర్మించడానికి ప్రజలు ఏ రెండు వస్తువులను ఉపయోగించారు?",
+      "options": [
+        "Wood and clay / కొయ్య మరియు బంకమన్ను",
+        "Bricks for stone, and tar for mortar / రాళ్లకు బదులుగా ఇటుకలు, మరియు అడుసుకు బదులుగా మట్టికీలు",
+        "Sand and water / ఇసుక మరియు నీరు",
+        "Marble and gold / పాలరాయి మరియు బంగారం"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "The main sin of the builders of Babel was rebellion against God's command to ____. / బాబెలును కట్టినవారి ప్రధాన పాపం ____ అనే దేవుని ఆజ్ఞపై తిరుగుబాటు.",
+      "options": [
+        "rest on the seventh day / ఏడవ రోజు విశ్రాంతి తీసుకోవాలి",
+        "offer sacrifices / బలులు అర్పించాలి",
+        "fill the earth and subdue it / భూమిని నిండించి దానిని లోపరచుకోవాలి",
+        "build an altar / బలిపీఠాన్ని నిర్మించాలి"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Who was the father of all who play the harp and flute? / సితారాను, పిల్లనగ్రోవిని వాయించే వారందరికీ మూలపురుషుడు ఎవరు?",
+      "options": [
+        "Cain / కయీను",
+        "Jubal / యూబాలు",
+        "Tubal-cain / తూబల్కయీను",
+        "Seth / షేతు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "In whose days was the earth divided? / ఎవరి దినములలో భూమి విభజింపబడెను?",
+      "options": [
+        "Nimrod / నిమ్రోదు",
+        "Shem / షేము",
+        "Peleg / పెలెగు",
+        "Noah / నోవహు"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "God formed man from the ____ and breathed into him the breath of life. / దేవుడు ____ నుండి మనిషిని చేసి, అతనిలో జీవవాయువును ఊదాడు.",
+      "options": [
+        "water of the sea / సముద్రపు నీటి",
+        "light of the first day / మొదటి రోజు వెలుగు",
+        "dust of the ground / నేల మంటి",
+        "rib of an angel / ఒక దేవదూత పక్కటెముక"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "The serpent's temptation began by making Eve ____ God's command. / సర్పం యొక్క శోధన, దేవుని ఆజ్ఞను ____ చేయడంతో ప్రారంభమైంది.",
+      "options": [
+        "forget / మరచిపోయేలా",
+        "question / ప్రశ్నించేలా",
+        "rewrite / తిరిగి వ్రాసేలా",
+        "obey / పాటించేలా"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What was the name of the land where Cain lived after he was sent away? / కయీను పంపబడిన తర్వాత నివసించిన దేశం పేరు ఏమిటి?",
+      "options": [
+        "Shinar / షీనారు",
+        "Eden / ఏదెను",
+        "Egypt / ఐగుప్తు",
+        "Nod / నోదు"
+      ],
+      "correct": 3
+    },
+    {
+      "question": "How many pairs of 'unclean' animals did Noah take on the ark? / నోవహు ఓడలోకి ఎన్ని జతల 'అపవిత్ర' జంతువులను తీసుకున్నాడు?",
+      "options": [
+        "One pair / ఒక జత",
+        "Two pairs / రెండు జతలు",
+        "Seven pairs / ఏడు జతలు",
+        "None / ఏవీ లేవు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which two great lights did God create on the fourth day? / నాల్గవ రోజు దేవుడు ఏ రెండు గొప్ప జ్యోతులను సృష్టించాడు?",
+      "options": [
+        "The sun and stars / సూర్యుడు మరియు నక్షత్రాలు",
+        "The sun and moon / సూర్యుడు మరియు చంద్రుడు",
+        "The moon and planets / చంద్రుడు మరియు గ్రహాలు",
+        "Two large stars / రెండు పెద్ద నక్షత్రాలు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "The curse on Ham's descendants was specifically that Canaan would be a ____. / హాము సంతానంపై శాపం ప్రత్యేకంగా కనాను ఒక ____ అవుతాడని ఉంది.",
+      "options": [
+        "wanderer / దేశదిమ్మరి",
+        "servant of servants / దాసులకు దాసుడు",
+        "mighty king / శక్తివంతమైన రాజు",
+        "false prophet / అబద్ధ ప్రవక్త"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What was the first thing God said was 'not good' in creation? / సృష్టిలో దేవుడు 'మంచిది కాదు' అని చెప్పిన మొదటి విషయం ఏమిటి?",
+      "options": [
+        "The darkness / చీకటి",
+        "The serpent's presence / సర్పం ఉనికి",
+        "That man should be alone / నరుడు ఒంటరిగా నుండుట",
+        "The Tree of Knowledge / తెలివినిచ్చే వృక్షం"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "The Table of Nations in Genesis 10 traces the descendants of whom? / ఆదికాండము 10లోని జనముల పట్టిక ఎవరి వంశస్థులను తెలియజేస్తుంది?",
+      "options": [
+        "Adam's sons / ఆదాము కుమారులు",
+        "Cain's family / కయీను కుటుంబం",
+        "Noah's sons / నోవహు కుమారులు",
+        "The people of Babel / బాబెలు ప్రజలు"
+      ],
+      "correct": 2
+    }
+  ]
+}
