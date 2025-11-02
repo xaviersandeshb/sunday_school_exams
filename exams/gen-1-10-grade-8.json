@@ -1,0 +1,407 @@
+{
+  "examName": "gen-1-10-grade-8",
+  "duration": 60,
+  "totalQuestions": 40,
+  "questions": [
+    {
+      "question": "Genesis 1:2 describes the early earth as 'formless and empty' and darkness over the surface of the ____. / ఆదికాండము 1:2 ప్రారంభ భూమిని 'నిరాకారముగాను శూన్యముగాను' మరియు ____ ఉపరితలంపై చీకటిగా వర్ణిస్తుంది.",
+      "options": [
+        "desert / ఎడారి",
+        "deep / అగాధజలము",
+        "mountains / పర్వతాలు",
+        "sun / సూర్యుడు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "To guard the way to the Tree of Life, what did God place east of the Garden of Eden? / జీవ వృక్షమునకు పోవు మార్గమును కాచుటకు, దేవుడు ఏదెను తోటకు తూర్పున ఏమి ఉంచాడు?",
+      "options": [
+        "A great wall and a deep river / ఒక గొప్ప గోడ మరియు లోతైన నది",
+        "A sleeping giant / నిద్రిస్తున్న ఒక రాక్షసుడు",
+        "A maze of thorns / ముళ్ళ కంచె",
+        "Cherubim and a flaming sword / కెరూబులను, ఖడ్గజ్వాలను"
+      ],
+      "correct": 3
+    },
+    {
+      "question": "When God asked Cain where his brother was, what was Cain's famous reply? / దేవుడు కయీనును నీ సహోదరుడు ఎక్కడ అని అడిగినప్పుడు, కయీను ప్రసిద్ధ సమాధానం ఏమిటి?",
+      "options": [
+        "'He has gone for a walk.' / 'అతడు నడకకు వెళ్ళాడు.'",
+        "'Am I my brother's keeper?' / 'నేను నా సహోదరునికి కావలివాడనా?'",
+        "'He is hiding from you.' / 'అతడు నీ నుండి దాక్కుంటున్నాడు.'",
+        "'Ask the serpent.' / 'సర్పాన్ని అడగండి.'"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What was the purpose of the mark God put on Cain? / దేవుడు కయీనుపై ఉంచిన గుర్తు యొక్క ఉద్దేశ్యం ఏమిటి?",
+      "options": [
+        "To show everyone his guilt / అందరికీ అతని అపరాధాన్ని చూపించడానికి",
+        "To cause him pain / అతనికి నొప్పి కలిగించడానికి",
+        "To prevent anyone from killing him / ఎవరూ అతన్ని చంపకుండా నిరోధించడానికి",
+        "To make him forget / అతను మరచిపోయేలా చేయడానికి"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "A descendant of Cain who boasted about killing a man was ____. / ఒక మనిషిని చంపడం గురించి గొప్పలు చెప్పుకున్న కయీను వంశస్థుడు ____.",
+      "options": [
+        "Enoch / హనోకు",
+        "Jared / యెరెదు",
+        "Lamech / లెమెకు",
+        "Methuselah / మెతూషెల"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Genesis 6 says Noah found ____ in the eyes of the Lord. / ఆదికాండము 6వ అధ్యాయం ప్రకారం, నోవహు యెహోవా దృష్టిలో ____ పొందాడు.",
+      "options": [
+        "wealth / సంపదను",
+        "grace / కృపను",
+        "knowledge / జ్ఞానాన్ని",
+        "strength / బలాన్ని"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Exactly how many people were saved on Noah's ark? / నోవహు ఓడలో సరిగ్గా ఎంత మంది రక్షించబడ్డారు?",
+      "options": [
+        "Two / ఇద్దరు",
+        "Four / నలుగురు",
+        "Eight / ఎనిమిది మంది",
+        "Twelve / పన్నెండు మంది"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "A covenant is best described as a sacred ____. / నిబంధనను పవిత్రమైన ____గా ఉత్తమంగా వర్ణించవచ్చు.",
+      "options": [
+        "law / చట్టం",
+        "story / కథ",
+        "agreement or promise / ఒప్పందం లేదా వాగ్దానం",
+        "building / భవనం"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What two materials did the people use to build the Tower of Babel? / బాబెలు గోపురాన్ని నిర్మించడానికి ప్రజలు ఏ రెండు వస్తువులను ఉపయోగించారు?",
+      "options": [
+        "Wood and clay / కొయ్య మరియు బంకమన్ను",
+        "Bricks for stone, and tar for mortar / రాళ్లకు బదులుగా ఇటుకలు, మరియు అడుసుకు బదులుగా మట్టికీలు",
+        "Sand and water / ఇసుక మరియు నీరు",
+        "Marble and gold / పాలరాయి మరియు బంగారం"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "The main sin of the builders of Babel was rebellion against God's command to ____. / బాబెలును కట్టినవారి ప్రధాన పాపం ____ అనే దేవుని ఆజ్ఞపై తిరుగుబాటు.",
+      "options": [
+        "rest on the seventh day / ఏడవ రోజు విశ్రాంతి తీసుకోవాలి",
+        "offer sacrifices / బలులు అర్పించాలి",
+        "fill the earth and subdue it / భూమిని నిండించి దానిని లోపరచుకోవాలి",
+        "build an altar / బలిపీఠాన్ని నిర్మించాలి"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Who was the father of all who play the harp and flute? / సితారాను, పిల్లనగ్రోవిని వాయించే వారందరికీ మూలపురుషుడు ఎవరు?",
+      "options": [
+        "Cain / కయీను",
+        "Jubal / యూబాలు",
+        "Tubal-cain / తూబల్కయీను",
+        "Seth / షేతు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "In whose days was the earth divided? / ఎవరి దినములలో భూమి విభజింపబడెను?",
+      "options": [
+        "Nimrod / నిమ్రోదు",
+        "Shem / షేము",
+        "Peleg / పెలెగు",
+        "Noah / నోవహు"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "God formed man from the ____ and breathed into him the breath of life. / దేవుడు ____ నుండి మనిషిని చేసి, అతనిలో జీవవాయువును ఊదాడు.",
+      "options": [
+        "water of the sea / సముద్రపు నీటి",
+        "light of the first day / మొదటి రోజు వెలుగు",
+        "dust of the ground / నేల మంటి",
+        "rib of an angel / ఒక దేవదూత పక్కటెముక"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "The serpent's temptation began by making Eve ____ God's command. / సర్పం యొక్క శోధన, దేవుని ఆజ్ఞను ____ చేయడంతో ప్రారంభమైంది.",
+      "options": [
+        "forget / మరచిపోయేలా",
+        "question / ప్రశ్నించేలా",
+        "rewrite / తిరిగి వ్రాసేలా",
+        "obey / పాటించేలా"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What was the name of the land where Cain lived after he was sent away? / కయీను పంపబడిన తర్వాత నివసించిన దేశం పేరు ఏమిటి?",
+      "options": [
+        "Shinar / షీనారు",
+        "Eden / ఏదెను",
+        "Egypt / ఐగుప్తు",
+        "Nod / నోదు"
+      ],
+      "correct": 3
+    },
+    {
+      "question": "How many pairs of 'unclean' animals did Noah take on the ark? / నోవహు ఓడలోకి ఎన్ని జతల 'అపవిత్ర' జంతువులను తీసుకున్నాడు?",
+      "options": [
+        "One pair / ఒక జత",
+        "Two pairs / రెండు జతలు",
+        "Seven pairs / ఏడు జతలు",
+        "None / ఏవీ లేవు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which two great lights did God create on the fourth day? / నాల్గవ రోజు దేవుడు ఏ రెండు గొప్ప జ్యోతులను సృష్టించాడు?",
+      "options": [
+        "The sun and stars / సూర్యుడు మరియు నక్షత్రాలు",
+        "The sun and moon / సూర్యుడు మరియు చంద్రుడు",
+        "The moon and planets / చంద్రుడు మరియు గ్రహాలు",
+        "Two large stars / రెండు పెద్ద నక్షత్రాలు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "The curse on Ham's descendants was specifically that Canaan would be a ____. / హాము సంతానంపై శాపం ప్రత్యేకంగా కనాను ఒక ____ అవుతాడని ఉంది.",
+      "options": [
+        "wanderer / దేశదిమ్మరి",
+        "servant of servants / దాసులకు దాసుడు",
+        "mighty king / శక్తివంతమైన రాజు",
+        "false prophet / అబద్ధ ప్రవక్త"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What was the first thing God said was 'not good' in creation? / సృష్టిలో దేవుడు 'మంచిది కాదు' అని చెప్పిన మొదటి విషయం ఏమిటి?",
+      "options": [
+        "The darkness / చీకటి",
+        "The serpent's presence / సర్పం ఉనికి",
+        "That man should be alone / నరుడు ఒంటరిగా నుండుట",
+        "The Tree of Knowledge / తెలివినిచ్చే వృక్షం"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "The Table of Nations in Genesis 10 traces the descendants of whom? / ఆదికాండము 10లోని జనముల పట్టిక ఎవరి వంశస్థులను తెలియజేస్తుంది?",
+      "options": [
+        "Adam's sons / ఆదాము కుమారులు",
+        "Cain's family / కయీను కుటుంబం",
+        "Noah's sons / నోవహు కుమారులు",
+        "The people of Babel / బాబెలు ప్రజలు"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "In Genesis, the two creation accounts (Ch. 1 and Ch. 2) differ in focus. Genesis 1 presents a cosmic overview, while Genesis 2 focuses on ____. / ఆదికాండములో, రెండు సృష్టి వృత్తాంతాలు (అధ్యాయం 1 మరియు 2) దృష్టిలో విభిన్నంగా ఉంటాయి. అధ్యాయం 1 విశ్వవ్యాప్త అవలోకనాన్ని అందిస్తుండగా, అధ్యాయం 2 ____పై దృష్టి పెడుతుంది.",
+      "options": [
+        "the creation of angels / దేవదూతల సృష్టి",
+        "humanity's relationship with God and each other / దేవునితో మరియు ఒకరితో ఒకరు మానవాళి సంబంధం",
+        "the scientific process of creation / సృష్టి యొక్క శాస్త్రీయ ప్రక్రియ",
+        "the geography of the early world / ప్రారంభ ప్రపంచం యొక్క భౌగోళిక శాస్త్రం"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "The serpent's temptation promised Eve she would 'be like God, knowing good and evil.' This highlights the core sin of ____. / 'మీరు దేవుని వలె మంచి చెడ్డలను ఎరిగినవారై యుందురు' అని సర్పం హవ్వను శోధించింది. ఇది ____ అనే ప్రధాన పాపాన్ని హైలైట్ చేస్తుంది.",
+      "options": [
+        "curiosity / ఉత్సుకత",
+        "hunger / ఆకలి",
+        "wanting to usurp God's authority / దేవుని అధికారాన్ని ఆక్రమించాలనే కోరిక",
+        "ignorance / అజ్ఞానం"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "The curses in Genesis 3 foretell future conflict between the 'seed' of the woman and the 'seed' of the ____. / ఆదికాండము 3లోని శాపాలు స్త్రీ 'సంతానానికి' మరియు ____ యొక్క 'సంతానానికి' మధ్య భవిష్యత్తు సంఘర్షణను ప్రవచిస్తున్నాయి.",
+      "options": [
+        "man / పురుషుడు",
+        "serpent / సర్పం",
+        "earth / భూమి",
+        "angels / దేవదూతలు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "The long lifespans in the genealogy of Genesis 5 primarily serve to ____. / ఆదికాండము 5లోని వంశావళిలో సుదీర్ఘ ఆయుర్దాయాలు ప్రధానంగా ____కి ఉపయోగపడతాయి.",
+      "options": [
+        "prove early humans were healthier / తొలి మానవులు ఆరోగ్యంగా ఉన్నారని నిరూపించడానికి",
+        "show the effects of the Tree of Life / జీవవృక్షం యొక్క ప్రభావాలను చూపించడానికి",
+        "bridge the chronological gap from Adam to Noah / ఆదాము నుండి నోవహు వరకు కాలక్రమానుసారమైన అంతరాన్ని పూరించడానికి",
+        "list the kings who ruled the earth / భూమిని పాలించిన రాజులను జాబితా చేయడానికి"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "According to Genesis 6, the Nephilim were on the earth in those days, resulting from the union of the 'sons of God' and the 'daughters of men.' Who are the 'sons of God' generally interpreted to be? / ఆదికాండము 6 ప్రకారం, 'దేవుని కుమారులు' మరియు 'నరుల కుమార్తెలు' కలయిక ఫలితంగా ఆ రోజుల్లో నెఫీలీయులు భూమిపై ఉన్నారు. 'దేవుని కుమారులు' సాధారణంగా ఎవరుగా వ్యాఖ్యానించబడ్డారు?",
+      "options": [
+        "Descendants of Cain / కయీను వంశస్థులు",
+        "Kings and rulers / రాజులు మరియు పాలకులు",
+        "The righteous line of Seth / షేతు యొక్క నీతిగల వంశం",
+        "Followers of Noah / నోవహు అనుచరులు"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "The central point (chiasm) of the flood narrative is the phrase 'But God remembered Noah,' highlighting the theme of ____. / జలప్రళయ వృత్తాంతం యొక్క కేంద్ర బిందువు (కయాసమ్) 'అయితే దేవుడు నోవహును జ్ఞాపకము చేసుకొనెను' అనే వాక్యం, ఇది ____ అనే ఇతివృత్తాన్ని హైలైట్ చేస్తుంది.",
+      "options": [
+        "divine wrath / దైవిక ఉగ్రత",
+        "human survival / మానవ మనుగడ",
+        "God's faithfulness amidst judgment / తీర్పు మధ్యలో దేవుని విశ్వసనీయత",
+        "the power of nature / ప్రకృతి శక్తి"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "The Noahic Covenant is unique because it is unconditional and made with ____. / నోవహు నిబంధన ప్రత్యేకమైనది ఎందుకంటే ఇది షరతులు లేనిది మరియు ____తో చేయబడింది.",
+      "options": [
+        "only Noah's family / కేవలం నోవహు కుటుంబంతో",
+        "only the nation of Israel / కేవలం ఇశ్రాయేలు దేశంతో",
+        "all humanity and every living creature / సమస్త మానవాళి మరియు ప్రతి జీవరాశితో",
+        "only those who offer sacrifices / బలులు అర్పించే వారితో మాత్రమే"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "The command in Genesis 9:6, 'Whoever sheds human blood, by humans shall their blood be shed,' establishes a principle for ____ based on the sanctity of human life. / ఆదికాండము 9:6లోని 'నరుని రక్తమును చిందించు వాని రక్తమును నరుడే చిందింపవలెను' అనే ఆజ్ఞ, మానవ జీవన పవిత్రత ఆధారంగా ____ కొరకు ఒక సూత్రాన్ని స్థాపిస్తుంది.",
+      "options": [
+        "personal revenge / వ్యక్తిగత ప్రతీకారం",
+        "civil justice / పౌర న్యాయం",
+        "warfare / యుద్ధం",
+        "accidental death / ప్రమాదవశాత్తు మరణం"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "The scattering at Babel serves as a narrative foil to what future New Testament event, where the language barrier is overcome by the Holy Spirit? / బాబెలు వద్ద చెదరగొట్టబడటం, భవిష్యత్తులో కొత్త నిబంధనలో ఏ సంఘటనకు కథన విరుద్ధంగా పనిచేస్తుంది, ఇక్కడ పరిశుద్ధాత్మ ద్వారా భాషా అవరోధం అధిగమించబడింది?",
+      "options": [
+        "The Transfiguration of Jesus / యేసు రూపాంతరం",
+        "The dedication of the Temple / దేవాలయ ప్రతిష్ట",
+        "The Day of Pentecost / పెంతుకొస్తు దినము",
+        "The Sermon on the Mount / కొండమీది ప్రసంగం"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "The name 'Eve' is related to the Hebrew word for ____. / 'హవ్వ' అనే పేరు హిబ్రూ భాషలో ____ అనే పదానికి సంబంధించినది.",
+      "options": [
+        "mother / తల్లి",
+        "life / జీవం",
+        "helper / సహాయకురాలు",
+        "woman / స్త్రీ"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Tubal-cain, a descendant of Cain, is noted as the one who ____. / కయీను వంశస్థుడైన తూబల్కయీను, ____ చేసిన వానిగా గుర్తించబడ్డాడు.",
+      "options": [
+        "built the first city / మొదటి నగరాన్ని నిర్మించాడు",
+        "was the first musician / మొదటి సంగీతకారుడు",
+        "was the first polygamist / మొదటి బహుభార్యాత్వం కలవాడు",
+        "forged tools of bronze and iron / ఇత్తడి, ఇనుప పనిముట్లను చేసెను"
+      ],
+      "correct": 3
+    },
+    {
+      "question": "The 'Table of Nations' in Genesis 10 is theologically significant because it shows God's interest in ____. / ఆదికాండము 10లోని 'జనముల పట్టిక' దైవశాస్త్రపరంగా ముఖ్యమైనది ఎందుకంటే ఇది ____ పట్ల దేవుని ఆసక్తిని చూపుతుంది.",
+      "options": [
+        "creating a single, unified culture / ఒకే, ఏకీకృత సంస్కృతిని సృష్టించడం",
+        "only the lineage of Shem / కేవలం షేము వంశం",
+        "all the nations of the world / ప్రపంచంలోని అన్ని దేశాలు",
+        "separating peoples by language / భాషల ద్వారా ప్రజలను వేరు చేయడం"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "The primary motivation of the Babel builders was hubris, a form of ____. / బాబెలును కట్టినవారి ప్రాథమిక ప్రేరణ గర్వాతిశయం, ఇది ఒక రకమైన ____.",
+      "options": [
+        "fear / భయం",
+        "ignorance / అజ్ఞానం",
+        "defiant pride / ధిక్కారపూరిత గర్వం",
+        "creativity / సృజనాత్మకత"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What did God's provision of animal skins for Adam and Eve after they sinned signify? / ఆదాము, హవ్వలు పాపం చేసిన తర్వాత దేవుడు వారికి చర్మపు చొక్కాయులను అందించడం దేనికి సూచన?",
+      "options": [
+        "The beginning of animal domestication / జంతువులను మచ్చిక చేసుకోవడం ప్రారంభం",
+        "A covering for their shame that required a sacrifice (death) / వారి సిగ్గును కప్పడానికి ఒక బలి (మరణం) అవసరమని",
+        "God's anger at their disobedience / వారి అవిధేయతపై దేవుని కోపం",
+        "The need for warmer clothing outside the garden / తోట వెలుపల వెచ్చని దుస్తుల అవసరం"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "The repeated phrase 'And God saw that it was good' in Genesis 1 emphasizes the ____ of the original creation. / ఆదికాండము 1లో పునరావృతమయ్యే 'దేవుడు అది మంచిదని చూచెను' అనే వాక్యం, అసలైన సృష్టి యొక్క ____ను నొక్కి చెబుతుంది.",
+      "options": [
+        "complexity / సంక్లిష్టత",
+        "speed / వేగం",
+        "inherent goodness and order / స్వాభావిక మంచితనం మరియు క్రమం",
+        "potential for evil / చెడుకు అవకాశం"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "How is the curse on the ground ('Cursed is the ground because of you') in Genesis 3 partially reversed in the story of Noah? / ఆదికాండము 3లోని నేల మీది శాపం ('నీ వలన నేల శపింపబడియున్నది') నోవహు కథలో పాక్షికంగా ఎలా తిరగరాయబడింది?",
+      "options": [
+        "Noah offers a sacrifice that pleases God / నోవహు దేవునికి ఇష్టమైన బలిని అర్పిస్తాడు",
+        "Noah's name means 'rest' or 'comfort' from painful toil / నోవహు పేరుకు 'విశ్రాంతి' లేదా కష్టమైన పని నుండి 'నెమ్మది' అని అర్థం",
+        "The rainbow promises no more curses / ఇంద్రధనస్సు ఇకపై శాపాలు ఉండవని వాగ్దానం చేస్తుంది",
+        "God allows humans to eat meat / దేవుడు మనుషులను మాంసం తినడానికి అనుమతిస్తాడు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "The two distinct trees in the middle of the Garden of Eden represent ____. / ఏదెను తోట మధ్యలో ఉన్న రెండు ప్రత్యేకమైన చెట్లు ____ను సూచిస్తాయి.",
+      "options": [
+        "God's power and human weakness / దేవుని శక్తి మరియు మానవ బలహీనత",
+        "two paths for humanity: life through obedience or death through disobedience / మానవాళికి రెండు మార్గాలు: విధేయత ద్వారా జీవం లేదా అవిధేయత ద్వారా మరణం",
+        "the beginning and end of time / కాలం యొక్క ప్రారంభం మరియు ముగింపు",
+        "the male and female principles / పురుష మరియు స్త్రీ సూత్రాలు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "The account of Cain and Abel is the first biblical example of ____. / కయీను మరియు హేబెలుల వృత్తాంతం ____ కు మొదటి బైబిల్ ఉదాహరణ.",
+      "options": [
+        "sibling rivalry leading to murder / సోదర వైరం హత్యకు దారితీయడం",
+        "a dispute over property / ఆస్తిపై వివాదం",
+        "improper worship practices / సరికాని ఆరాధన పద్ధతులు",
+        "the consequences of leaving Eden / ఏదెనును విడిచిపెట్టడం యొక్క పర్యవసానాలు"
+      ],
+      "correct": 0
+    },
+    {
+      "question": "What does the name 'Adam' mean in Hebrew? / హిబ్రూ భాషలో 'ఆదాము' అనే పదానికి అర్థం ఏమిటి?",
+      "options": [
+        "First / మొదటి",
+        "Man or Mankind, related to the word for 'ground' / మనిషి లేదా మానవుడు, నేల అనే పదానికి సంబంధించినది",
+        "King / రాజు",
+        "Breath of Life / జీవ శ్వాస"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "The Tower of Babel story shows humanity trying to achieve unity and security through ____, rather than through God. / బాబెలు గోపురం కథ, మానవాళి దేవుని ద్వారా కాకుండా ____ ద్వారా ఐక్యత మరియు భద్రతను సాధించడానికి ప్రయత్నిస్తున్నట్లు చూపుతుంది.",
+      "options": [
+        "military strength / సైనిక బలం",
+        "peaceful diplomacy / శాంతియుత దౌత్యం",
+        "their own efforts and technology / వారి స్వంత ప్రయత్నాలు మరియు సాంకేతికత",
+        "religious rituals / మతపరమైన ఆచారాలు"
+      ],
+      "correct": 2
+    }
+  ]
+}
