@@ -1,0 +1,107 @@
+{
+  "examName": "gen-1-10-grade-4",
+  "duration": 15,
+  "totalQuestions": 10,
+  "questions": [
+    {
+      "question": "Who created the heavens and the earth? / ఆకాశాలను, భూమిని సృష్టించింది ఎవరు?",
+      "options": [
+        "Adam / ఆదాము",
+        "Noah / నోవహు",
+        "God / దేవుడు",
+        "An angel / ఒక దేవదూత"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What did God create on the first day? / దేవుడు మొదటి రోజు ఏమి సృష్టించాడు?",
+      "options": [
+        "Animals / జంతువులు",
+        "Light / వెలుగు",
+        "People / ప్రజలు",
+        "Plants / మొక్కలు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Who were the first man and woman? / మొదటి పురుషుడు మరియు స్త్రీ ఎవరు?",
+      "options": [
+        "Cain and Abel / కయీను మరియు హేబెలు",
+        "Shem and Ham / షేము మరియు హాము",
+        "Adam and Eve / ఆదాము మరియు హవ్వ",
+        "Noah and his wife / నోవహు మరియు అతని భార్య"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "In which special garden did Adam and Eve live? / ఆదాము మరియు హవ్వ ఏ ప్రత్యేక తోటలో నివసించారు?",
+      "options": [
+        "The Hanging Gardens / వేలాడే తోటలు",
+        "The Garden of Eden / ఏదెను తోట",
+        "The Secret Garden / రహస్య తోట",
+        "The King's Garden / రాజుగారి తోట"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which animal tricked Eve into eating the forbidden fruit? / నిషేధించబడిన పండును తినమని హవ్వను మోసగించిన జంతువు ఏది?",
+      "options": [
+        "A lion / ఒక సింహం",
+        "A bird / ఒక పక్షి",
+        "A serpent / ఒక సర్పం",
+        "A fish / ఒక చేప"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Who were Adam and Eve's first two sons? / ఆదాము మరియు హవ్వల మొదటి ఇద్దరు కుమారులు ఎవరు?",
+      "options": [
+        "Jacob and Esau / యాకోబు మరియు ఏశావు",
+        "Peter and John / పేతురు మరియు యోహాను",
+        "David and Goliath / దావీదు మరియు గొల్యాతు",
+        "Cain and Abel / కయీను మరియు హేబెలు"
+      ],
+      "correct": 3
+    },
+    {
+      "question": "Who built a giant boat called an ark to save his family from a great flood? / గొప్ప జలప్రళయం నుండి తన కుటుంబాన్ని రక్షించడానికి ఓడ అనే పెద్ద పడవను ఎవరు నిర్మించారు?",
+      "options": [
+        "Adam / ఆదాము",
+        "Noah / నోవహు",
+        "Moses / మోషే",
+        "Seth / షేతు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Why did God send a great flood? / దేవుడు గొప్ప జలప్రళయాన్ని ఎందుకు పంపాడు?",
+      "options": [
+        "The world was too dry / ప్రపంచం చాలా పొడిగా ఉంది",
+        "The people on earth had become very wicked / భూమిపై ప్రజలు చాలా దుర్మార్గులుగా మారారు",
+        "The animals were fighting / జంతువులు పోట్లాడుకుంటున్నాయి",
+        "He wanted to clean the mountains / ఆయన పర్వతాలను శుభ్రం చేయాలనుకున్నాడు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What did Noah take onto the ark with him? / నోవహు తనతో పాటు ఓడలోకి ఏమి తీసుకున్నాడు?",
+      "options": [
+        "Only his family / కేవలం తన కుటుంబాన్ని",
+        "Only gold and silver / కేవలం బంగారం మరియు వెండి",
+        "His family and pairs of every kind of animal / తన కుటుంబం మరియు అన్ని రకాల జంతువుల జతలు",
+        "Only birds / కేవలం పక్షులు"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What colorful sign did God put in the sky as a promise to never flood the whole earth again? / భూమిని మళ్లీ ఎన్నడూ జలప్రళయంతో ముంచనని వాగ్దానంగా దేవుడు ఆకాశంలో ఉంచిన రంగురంగుల గుర్తు ఏది?",
+      "options": [
+        "A special star / ఒక ప్రత్యేక నక్షత్రం",
+        "A big cloud / ఒక పెద్ద మేఘం",
+        "A rainbow / ఒక ఇంద్రధనస్సు",
+        "A second moon / రెండవ చంద్రుడు"
+      ],
+      "correct": 2
+    }
+  ]
+}
