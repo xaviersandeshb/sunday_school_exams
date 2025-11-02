@@ -21,25 +21,31 @@
     const { useState, useEffect, useCallback, createElement: h } = React;
     const { createRoot } = ReactDOM;
 
-    // ===== GITHUB CONFIGURATION =====
-    // Replace these with your actual values
+    // GOOGLE SHEETS CONFIG
+    const GOOGLE_CONFIG = {
+      sheetId: '1Bm8T6sp8Y1J-Qw4yTCC22DDRmYBFukMVLM_v_f8wtIw',
+      formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSciPMSBYpCzmDDz59rhh-jvZpgQfyNQT0WEvqFerWi9rMBftg/formResponse',
+      formId: '1FAIpQLSciPMSBYpCzmDDz59rhh-jvZpgQfyNQT0WEvqFerWi9rMBftg',
+      entryIds: {
+        studentName: '157339701',
+        examName: '879024982',
+        marks: '951598159',
+        percentage: '1233706368',
+        timestamp: '1921920176'
+      }
+    };
+
+    // GITHUB CONFIG
     const GITHUB_CONFIG = {
-      username: 'xaviersandeshb',  // Replace with your GitHub username
+      username: 'xaviersandeshb',
       repo: 'sunday_school_exams',
-      token: '',  // Replace with your personal access token
+      token: '',
       branch: 'main'
     };
-    const getGitHubToken = () => {
-      return localStorage.getItem('github_token') || GITHUB_CONFIG.token;
-    };
 
-    const saveGitHubToken = (token) => {
-      localStorage.setItem('github_token', token);
-    };
+    const getGitHubToken = () => localStorage.getItem('github_token') || GITHUB_CONFIG.token;
+    const saveGitHubToken = (token) => localStorage.setItem('github_token', token);
 
-    const clearGitHubToken = () => {
-      localStorage.removeItem('github_token');
-    };
     function ExamSystem() {
       const [view, setView] = useState('login');
       const [studentName, setStudentName] = useState('');
@@ -54,9 +60,18 @@
       const [isSpeaking, setIsSpeaking] = useState(false);
       const [availableExams, setAvailableExams] = useState([]);
       const [isUploading, setIsUploading] = useState(false);
-      const adminPassword = 'admin123';
       const [passwordInput, setPasswordInput] = useState('');
       const [githubToken, setGithubToken] = useState('');
+      const [examFilter, setExamFilter] = useState('');
+      const [isSyncing, setIsSyncing] = useState(false);
+
+      const adminPassword = 'admin123';
+
+      // Load token on mount
+      useEffect(() => {
+        const savedToken = getGitHubToken();
+        if (savedToken) setGithubToken(savedToken);
+      }, []);
 
       // Load results from localStorage
       useEffect(() => {
@@ -81,12 +96,6 @@
         }
       }, [allResults]);
 
-      useEffect(() => {
-      const savedToken = getGitHubToken();
-      if (savedToken) {
-        setGithubToken(savedToken);
-      }
-}, []);
       // Fetch available exams from GitHub
       const fetchAvailableExams = useCallback(async () => {
         try {
@@ -108,73 +117,132 @@
         }
       }, []);
 
-      // Load exam from GitHub by name
-      // const loadExamFromGitHub = async (examFileName) => {
-      //   try {
-      //     const url = `https://raw.githubusercontent.com/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/exams/${examFileName}.json`;
-      //     const response = await fetch(url);
-
-      //     if (response.ok) {
-      //       const json = await response.json();
-      //       if (json.questions && json.questions.length > 0) {
-      //         setExamData(json);
-      //         return true;
-      //       }
-      //     }
-      //     return false;
-      //   } catch (error) {
-      //     console.error('Failed to load exam:', error);
-      //     return false;
-      //   }
-      // };
-      // Load exam from GitHub by name
+      // Load exam from GitHub
       const loadExamFromGitHub = async (examFileName) => {
         try {
           const url = `https://raw.githubusercontent.com/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/exams/${examFileName}.json`;
           const response = await fetch(url);
-          
+
           if (response.ok) {
             const json = await response.json();
             if (json.questions && json.questions.length > 0) {
               setExamData(json);
-              return json; // Return the exam data instead of true
+              return json;
             }
           }
-          return null; // Return null instead of false
+          return null;
         } catch (error) {
           console.error('Failed to load exam:', error);
           return null;
         }
       };
 
-      // Upload JSON file to GitHub
+      // Upload results to GitHub
+      const uploadResultsExcel = async (results) => {
+        try {
+          const token = getGitHubToken();
+          
+          if (!token) {
+            console.log('No token available, skipping upload');
+            return false;
+          }
+
+          const worksheet = XLSX.utils.json_to_sheet(results);
+          const workbook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workbook, worksheet, 'Results');
+
+          const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+          const base64 = btoa(String.fromCharCode(...new Uint8Array(wbout)));
+
+          const url = `https://api.github.com/repos/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/contents/results.xlsx`;
+
+          let sha = null;
+          
+          try {
+            const checkResponse = await fetch(url, { 
+              headers: { 'Authorization': `token ${token}` } 
+            });
+            if (checkResponse.ok) {
+              const existingFile = await checkResponse.json();
+              sha = existingFile.sha;
+            }
+          } catch (e) {
+            console.log('File check:', e.message);
+          }
+
+          const body = {
+            message: 'Update exam results from CSV',
+            content: base64,
+            branch: GITHUB_CONFIG.branch
+          };
+          if (sha) body.sha = sha;
+
+          const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `token ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Upload failed');
+          }
+          return true;
+        } catch (error) {
+          console.error('Upload error:', error);
+          alert('Failed to upload to GitHub: ' + error.message);
+          return false;
+        }
+      };
+
+      // Submit exam result to Google Form
+      const submitToGoogleForm = async (studentResult) => {
+        try {
+          const formData = new FormData();
+          formData.append(`entry.${GOOGLE_CONFIG.entryIds.studentName}`, studentResult.studentName);
+          formData.append(`entry.${GOOGLE_CONFIG.entryIds.examName}`, studentResult.examName);
+          formData.append(`entry.${GOOGLE_CONFIG.entryIds.marks}`, studentResult.marks);
+          formData.append(`entry.${GOOGLE_CONFIG.entryIds.percentage}`, studentResult.percentage);
+          formData.append(`entry.${GOOGLE_CONFIG.entryIds.timestamp}`, studentResult.timestamp);
+
+          const response = await fetch(GOOGLE_CONFIG.formUrl, {
+            method: 'POST',
+            body: formData,
+            mode: 'no-cors'
+          });
+
+          console.log('Form submitted successfully');
+          return true;
+        } catch (error) {
+          console.error('Form submission error:', error);
+          return false;
+        }
+      };
+
+      // Upload exam JSON to GitHub
       const uploadToGitHub = async (fileName, content) => {
         try {
-          // Get token from BOTH state and localStorage
           let token = githubToken || getGitHubToken();
-          
-          // Check if token exists
+
           if (!token || token.trim() === '') {
-            alert('❌ GitHub token is missing!\n\nPlease enter your GitHub Personal Access Token in the red box above, then click "Save Token".');
+            alert('❌ GitHub token is missing!');
             return false;
           }
-          
+
           token = token.trim();
-          
-          // Validate token format
+
           if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) {
-            alert('❌ Invalid token format!\n\nGitHub tokens should start with "ghp_" or "github_pat_"\n\nPlease check your token and try again.');
+            alert('❌ Invalid token format!');
             return false;
           }
-          
-          console.log('✓ Using token:', token.substring(0, 15) + '...');
-          console.log('✓ Uploading to:', `${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/exams/${fileName}`);
-          
+
           setIsUploading(true);
 
           const url = `https://api.github.com/repos/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/contents/exams/${fileName}`;
 
-          // Check if file exists
           let sha = null;
           try {
             const checkResponse = await fetch(url, {
@@ -183,18 +251,13 @@
                 'Accept': 'application/vnd.github.v3+json'
               }
             });
-            
+
             if (checkResponse.ok) {
               const existingFile = await checkResponse.json();
               sha = existingFile.sha;
-              console.log('✓ File exists, will update');
-            } else if (checkResponse.status === 404) {
-              console.log('✓ File does not exist, will create new');
-            } else {
-              console.warn('Check file returned:', checkResponse.status);
             }
           } catch (e) {
-            console.log('File check (expected if new):', e.message);
+            console.log('File check:', e.message);
           }
 
           const body = {
@@ -220,36 +283,21 @@
           setIsUploading(false);
 
           if (response.ok) {
-            console.log('✓ Upload successful!');
             await fetchAvailableExams();
             return true;
           } else {
             const error = await response.json();
-            console.error('❌ GitHub API error:', error);
-            
-            // Show specific error message
-            let errorMessage = '';
-            if (response.status === 401) {
-              errorMessage = '❌ Authentication Failed!\n\nYour token is invalid or expired.\n\nPlease:\n1. Go to github.com/settings/tokens\n2. Generate a new token with "repo" permission\n3. Paste it in the red box above\n4. Click "Save Token"';
-            } else if (response.status === 403) {
-              errorMessage = '❌ Permission Denied!\n\nYour token does not have permission to write to this repository.\n\nPlease:\n1. Go to github.com/settings/tokens\n2. Make sure your token has "repo" scope checked ✓\n3. Or generate a new token with full "repo" access';
-            } else if (response.status === 404) {
-              errorMessage = '❌ Repository Not Found!\n\nCannot find: ' + GITHUB_CONFIG.username + '/' + GITHUB_CONFIG.repo + '\n\nPlease check:\n1. Username is correct: ' + GITHUB_CONFIG.username + '\n2. Repository name is correct: ' + GITHUB_CONFIG.repo + '\n3. Repository exists and is public';
-            } else {
-              errorMessage = '❌ Upload Failed!\n\nError: ' + (error.message || 'Unknown error') + '\nStatus: ' + response.status;
-            }
-            
-            alert(errorMessage);
+            alert('❌ Upload Failed!\n\nError: ' + (error.message || 'Unknown error'));
             return false;
           }
         } catch (error) {
           setIsUploading(false);
-          console.error('❌ Upload error:', error);
-          alert('❌ Upload Error!\n\n' + error.message + '\n\nCheck browser console (F12) for details.');
+          alert('❌ Upload Error!\n\n' + error.message);
           return false;
         }
       };
- 
+
+      // Text-to-speech with Telugu support
       const speakQuestion = (text) => {
         if ('speechSynthesis' in window) {
           window.speechSynthesis.cancel();
@@ -260,7 +308,35 @@
           }
 
           const utterance = new SpeechSynthesisUtterance(text);
-          utterance.rate = 0.9;
+
+          const hasTeluguText = /[\u0C00-\u0C7F]/.test(text);
+          const voices = window.speechSynthesis.getVoices();
+
+          if (hasTeluguText) {
+            const teluguVoice = voices.find(voice =>
+              voice.lang.startsWith('te') ||
+              voice.lang === 'te-IN' ||
+              voice.name.toLowerCase().includes('telugu')
+            );
+
+            if (teluguVoice) {
+              utterance.voice = teluguVoice;
+              utterance.lang = 'te-IN';
+            } else {
+              utterance.lang = 'te-IN';
+            }
+            utterance.rate = 0.85;
+          } else {
+            const englishVoice = voices.find(voice =>
+              voice.lang === 'en-US' || voice.lang === 'en-GB'
+            );
+            if (englishVoice) {
+              utterance.voice = englishVoice;
+            }
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9;
+          }
+
           utterance.pitch = 1;
           utterance.volume = 1;
 
@@ -269,6 +345,8 @@
           utterance.onerror = () => setIsSpeaking(false);
 
           window.speechSynthesis.speak(utterance);
+        } else {
+          alert('Text-to-speech is not supported in your browser.');
         }
       };
 
@@ -293,54 +371,30 @@
           return;
         }
 
-        // Student login - go to exam selection
         setView('exam-selection');
       };
 
-      // const handleExamSelection = async (e) => {
-      //   if (e) e.preventDefault();
+      const handleExamSelection = async (e) => {
+        if (e) e.preventDefault();
 
-      //   if (!examName.trim()) {
-      //     alert('Please enter exam name');
-      //     return;
-      //   }
+        if (!examName.trim()) {
+          alert('Please enter exam name');
+          return;
+        }
 
-      //   const success = await loadExamFromGitHub(examName);
+        const loadedExam = await loadExamFromGitHub(examName);
 
-      //   if (success) {
-      //     setView('exam');
-      //     setTimeLeft(examData.duration * 60 || 1800);
-      //     setExamStarted(true);
-      //     setAnswers({});
-      //     setCurrentQuestion(0);
-      //   } else {
-      //     alert(`Exam "${examName}" not found. Please check the exam name and try again.`);
-      //   }
-      // };
-
-    const handleExamSelection = async (e) => {
-      if (e) e.preventDefault();
-      
-      if (!examName.trim()) {
-        alert('Please enter exam name');
-        return;
-      }
-
-      const loadedExam = await loadExamFromGitHub(examName);
-      
-      if (loadedExam) {
-        // Use the returned exam data directly to set timer
-        const durationInSeconds = (loadedExam.duration || 30) * 60;
-        setTimeLeft(durationInSeconds);
-        setExamStarted(true);
-        setAnswers({});
-        setCurrentQuestion(0);
-        setView('exam');
-      } else {
-        alert(`Exam "${examName}" not found. Please check the exam name and try again.`);
-      }
-    };
-
+        if (loadedExam) {
+          const durationInSeconds = (loadedExam.duration || 30) * 60;
+          setTimeLeft(durationInSeconds);
+          setExamStarted(true);
+          setAnswers({});
+          setCurrentQuestion(0);
+          setView('exam');
+        } else {
+          alert(`Exam "${examName}" not found. Please check the exam name and try again.`);
+        }
+      };
 
       const handleAdminLogin = () => {
         if (passwordInput === adminPassword) {
@@ -367,13 +421,12 @@
                 return;
               }
 
-              // Create filename from exam name
               const fileName = json.examName.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.json';
 
               const success = await uploadToGitHub(fileName, content);
 
               if (success) {
-                alert(`Exam "${json.examName}" uploaded successfully to GitHub!\nFilename: ${fileName}\nStudents can now access it.`);
+                alert(`Exam "${json.examName}" uploaded successfully to GitHub!`);
               } else {
                 alert('Failed to upload exam to GitHub. Please check your token and try again.');
               }
@@ -386,15 +439,90 @@
         }
       };
 
-      const clearAllResults = () => {
-        if (confirm('Are you sure you want to delete ALL student results? This cannot be undone!')) {
+      const handleCSVUpload = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = async (event) => {
+            try {
+              setIsSyncing(true);
+              const csvText = event.target.result;
+              const results = [];
+              const lines = csvText.split('\n');
+              
+              if (lines.length < 2) {
+                alert('CSV file is empty');
+                setIsSyncing(false);
+                return;
+              }
+              
+              const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+              
+              for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                const values = line.split(',').map(v => v.trim());
+                
+                const row = {
+                  timestamp: values[headers.indexOf('timestamp')] || '',
+                  studentName: values[headers.indexOf('student name')] || values[headers.indexOf('studentname')] || '',
+                  examName: values[headers.indexOf('exam name')] || values[headers.indexOf('examname')] || '',
+                  marks: values[headers.indexOf('marks')] || '',
+                  percentage: values[headers.indexOf('percentage')] || ''
+                };
+                
+                if (row.studentName && row.examName) {
+                  results.push(row);
+                }
+              }
+              
+              if (results.length === 0) {
+                alert('No valid results in CSV file');
+                setIsSyncing(false);
+                return;
+              }
+              
+              // Rank the results
+              const examGroups = {};
+              results.forEach(r => {
+                if (!examGroups[r.examName]) examGroups[r.examName] = [];
+                examGroups[r.examName].push(r);
+              });
+              
+              const rankedResults = [];
+              Object.keys(examGroups).forEach(exam => {
+                const sorted = examGroups[exam].sort((a, b) => 
+                  parseFloat(b.percentage || 0) - parseFloat(a.percentage || 0)
+                );
+                sorted.forEach((r, idx) => {
+                  rankedResults.push({ ...r, rank: idx + 1, examName: exam });
+                });
+              });
+              
+              // Upload to GitHub
+              const uploaded = await uploadResultsExcel(rankedResults);
+              
+              setIsSyncing(false);
+              
+              if (uploaded) {
+                setAllResults(rankedResults);
+                alert(`✓ Successfully uploaded!\n\nRecords: ${rankedResults.length}\nExams: ${Object.keys(examGroups).length}`);
+              }
+            } catch (error) {
+              setIsSyncing(false);
+              alert('Error processing CSV: ' + error.message);
+            }
+          };
+          reader.readAsText(file);
+        }
+      };
+
+      const clearAllResults = async () => {
+        if (confirm('Are you sure you want to delete ALL student results?')) {
           setAllResults([]);
-          try {
-            localStorage.removeItem('all-results');
-            alert('All results cleared!');
-          } catch (error) {
-            console.error('Failed to clear results:', error);
-          }
+          localStorage.removeItem('all-results');
+          alert('All results cleared!');
         }
       };
 
@@ -420,7 +548,7 @@
         };
       };
 
-      const handleSubmit = useCallback(() => {
+      const handleSubmit = useCallback(async () => {
         if (!examData) return;
 
         setExamStarted(false);
@@ -434,20 +562,16 @@
           timestamp: new Date().toLocaleString()
         };
 
+        const submitted = await submitToGoogleForm(newResult);
+        
+        if (!submitted) {
+          alert('⚠️ Could not submit to Google Form. Please try again.');
+          return;
+        }
+
         const updatedResults = [...allResults, newResult];
+        setAllResults(updatedResults);
 
-        const sortedResults = [...updatedResults].sort((a, b) => 
-          parseFloat(b.percentage) - parseFloat(a.percentage)
-        );
-
-        const resultsWithRank = updatedResults.map(r => ({
-          ...r,
-          rank: sortedResults.findIndex(sr => 
-            sr.studentName === r.studentName && sr.timestamp === r.timestamp
-          ) + 1
-        })).sort((a, b) => a.rank - b.rank);
-
-        setAllResults(resultsWithRank);
         setView('results');
       }, [examData, studentName, allResults, answers]);
 
@@ -462,7 +586,7 @@
 
       const exportToExcel = () => {
         if (typeof XLSX === 'undefined') {
-          alert('Excel export library not loaded. Please refresh the page and try again.');
+          alert('Excel export library not loaded. Please refresh the page.');
           return;
         }
 
@@ -478,7 +602,7 @@
           XLSX.writeFile(workbook, `Sunday_School_Exam_Results.xlsx`);
         } catch (error) {
           console.error('Export error:', error);
-          alert('Failed to export results. Please try again.');
+          alert('Failed to export results.');
         }
       };
 
@@ -501,115 +625,122 @@
         setPasswordInput('');
       };
 
-      // SVG Icons
+      const filteredResults = examFilter
+        ? allResults.filter(r => r.examName && r.examName.toLowerCase().includes(examFilter.toLowerCase()))
+        : allResults;
+
+      // Icons
       const icons = {
-        clock: h('svg', {width:24,height:24,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2},
-          h('circle',{cx:12,cy:12,r:10}),
-          h('polyline',{points:'12 6 12 12 16 14'})
+        clock: h('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
+          h('circle', { cx: 12, cy: 12, r: 10 }),
+          h('polyline', { points: '12 6 12 12 16 14' })
         ),
-        upload: h('svg', {width:20,height:20,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2},
-          h('path',{d:'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'}),
-          h('polyline',{points:'17 8 12 3 7 8'}),
-          h('line',{x1:12,y1:3,x2:12,y2:15})
+        upload: h('svg', { width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
+          h('path', { d: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4' }),
+          h('polyline', { points: '17 8 12 3 7 8' }),
+          h('line', { x1: 12, y1: 3, x2: 12, y2: 15 })
         ),
-        check: h('svg', {width:24,height:24,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2},
-          h('path',{d:'M22 11.08V12a10 10 0 1 1-5.93-9.14'}),
-          h('polyline',{points:'22 4 12 14.01 9 11.01'})
+        check: h('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
+          h('path', { d: 'M22 11.08V12a10 10 0 1 1-5.93-9.14' }),
+          h('polyline', { points: '22 4 12 14.01 9 11.01' })
         ),
-        alert: h('svg', {width:24,height:24,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2},
-          h('circle',{cx:12,cy:12,r:10}),
-          h('line',{x1:12,y1:8,x2:12,y2:12}),
-          h('line',{x1:12,y1:16,x2:12.01,y2:16})
+        alert: h('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
+          h('circle', { cx: 12, cy: 12, r: 10 }),
+          h('line', { x1: 12, y1: 8, x2: 12, y2: 12 }),
+          h('line', { x1: 12, y1: 16, x2: 12.01, y2: 16 })
         ),
-        download: h('svg', {width:20,height:20,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2},
-          h('path',{d:'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'}),
-          h('polyline',{points:'7 10 12 15 17 10'}),
-          h('line',{x1:12,y1:15,x2:12,y2:3})
+        download: h('svg', { width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
+          h('path', { d: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4' }),
+          h('polyline', { points: '7 10 12 15 17 10' }),
+          h('line', { x1: 12, y1: 15, x2: 12, y2: 3 })
         ),
-        users: h('svg', {width:40,height:40,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2},
-          h('path',{d:'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2'}),
-          h('circle',{cx:9,cy:7,r:4}),
-          h('path',{d:'M23 21v-2a4 4 0 0 0-3-3.87'}),
-          h('path',{d:'M16 3.13a4 4 0 0 1 0 7.75'})
+        users: h('svg', { width: 40, height: 40, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
+          h('path', { d: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2' }),
+          h('circle', { cx: 9, cy: 7, r: 4 }),
+          h('path', { d: 'M23 21v-2a4 4 0 0 0-3-3.87' }),
+          h('path', { d: 'M16 3.13a4 4 0 0 1 0 7.75' })
         ),
-        volume: h('svg', {width:24,height:24,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2},
-          h('polygon',{points:'11 5 6 9 2 9 2 15 6 15 11 19 11 5'}),
-          h('path',{d:'M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07'})
+        volume: h('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
+          h('polygon', { points: '11 5 6 9 2 9 2 15 6 15 11 19 11 5' }),
+          h('path', { d: 'M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07' })
         ),
-        volumeX: h('svg', {width:24,height:24,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2},
-          h('polygon',{points:'11 5 6 9 2 9 2 15 6 15 11 19 11 5'}),
-          h('line',{x1:23,y1:9,x2:17,y2:15}),
-          h('line',{x1:17,y1:9,x2:23,y2:15})
+        volumeX: h('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
+          h('polygon', { points: '11 5 6 9 2 9 2 15 6 15 11 19 11 5' }),
+          h('line', { x1: 23, y1: 9, x2: 17, y2: 15 }),
+          h('line', { x1: 17, y1: 9, x2: 23, y2: 15 })
         ),
-        trash: h('svg', {width:16,height:16,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2},
-          h('polyline',{points:'3 6 5 6 21 6'}),
-          h('path',{d:'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'})
+        trash: h('svg', { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
+          h('polyline', { points: '3 6 5 6 21 6' }),
+          h('path', { d: 'M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2' })
         ),
-        book: h('svg', {width:24,height:24,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:2},
-          h('path',{d:'M4 19.5A2.5 2.5 0 0 1 6.5 17H20'}),
-          h('path',{d:'M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z'})
+        book: h('svg', { width: 24, height: 24, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
+          h('path', { d: 'M4 19.5A2.5 2.5 0 0 1 6.5 17H20' }),
+          h('path', { d: 'M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z' })
+        ),
+        key: h('svg', { width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
+          h('path', { d: 'M21 2l-9 4m0 0L5 2m7 4v13m0 0l7 4m-7-4l-7 4' })
         )
       };
 
       // LOGIN VIEW
       if (view === 'login') {
-        return h('div', {className:'min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4'},
-          h('div', {className:'bg-white rounded-2xl shadow-xl p-8 w-full max-w-md'},
-            h('div', {className:'text-center mb-8'},
-              h('div', {className:'bg-indigo-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4'}, icons.users),
-              h('h1', {className:'text-3xl font-bold text-gray-800'}, 'Sunday School Exam'),
-              h('p', {className:'text-gray-600 mt-2'}, 'Enter your name to begin')
+        return h('div', { className: 'min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4' },
+          h('div', { className: 'bg-white rounded-2xl shadow-xl p-8 w-full max-w-md' },
+            h('div', { className: 'text-center mb-8' },
+              h('div', { className: 'bg-indigo-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4' }, icons.users),
+              h('h1', { className: 'text-3xl font-bold text-gray-800' }, 'Sunday School Exam'),
+              h('p', { className: 'text-gray-600 mt-2' }, 'Enter your name to begin')
             ),
             h('div', null,
               h('input', {
-                type:'text',
-                value:studentName,
-                onChange:(e)=>setStudentName(e.target.value),
-                placeholder:'Your Full Name',
-                className:'w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500 mb-4',
-                onKeyPress:(e)=>e.key==='Enter'&&handleLogin()
+                type: 'text',
+                value: studentName,
+                onChange: (e) => setStudentName(e.target.value),
+                placeholder: 'Your Full Name',
+                className: 'w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500 mb-4',
+                onKeyPress: (e) => e.key === 'Enter' && handleLogin()
               }),
               h('button', {
-                onClick:handleLogin,
-                className:'w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition'
+                onClick: handleLogin,
+                className: 'w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition'
               }, 'Continue')
             ),
-            h('p', {className:'text-sm text-gray-500 text-center mt-4'}, 'Type "admin" to access teacher dashboard')
+            h('p', { className: 'text-sm text-gray-500 text-center mt-4' }, 'Type "admin" to access teacher dashboard')
           )
         );
       }
 
       // EXAM SELECTION VIEW
       if (view === 'exam-selection') {
-        return h('div', {className:'min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4'},
-          h('div', {className:'bg-white rounded-2xl shadow-xl p-8 w-full max-w-md'},
-            h('div', {className:'text-center mb-8'},
-              h('div', {className:'bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4'}, icons.book),
-              h('h2', {className:'text-2xl font-bold text-gray-800'}, 'Select Exam'),
-              h('p', {className:'text-gray-600 mt-2'}, 'Hello, ' + studentName + '!'),
-              h('p', {className:'text-sm text-gray-500 mt-1'}, 'Enter the exam name provided by your teacher')
+        return h('div', { className: 'min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4' },
+          h('div', { className: 'bg-white rounded-2xl shadow-xl p-8 w-full max-w-md' },
+            h('div', { className: 'text-center mb-8' },
+              h('div', { className: 'bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4' }, icons.book),
+              h('h2', { className: 'text-2xl font-bold text-gray-800' }, 'Select Exam'),
+              h('p', { className: 'text-gray-600 mt-2' }, 'Hello, ' + studentName + '!'),
+              h('p', { className: 'text-sm text-gray-500 mt-1' }, 'Enter the exam name provided by your teacher')
             ),
             h('div', null,
               h('input', {
-                type:'text',
-                value:examName,
-                onChange:(e)=>setExamName(e.target.value),
-                placeholder:'Exam Name (e.g., genesis-quiz)',
-                className:'w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-green-500 mb-4',
-                onKeyPress:(e)=>e.key==='Enter'&&handleExamSelection()
+                type: 'text',
+                value: examName,
+                onChange: (e) => setExamName(e.target.value),
+                placeholder: 'Exam Name (e.g., genesis-quiz)',
+                className: 'w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-green-500 mb-4',
+                onKeyPress: (e) => e.key === 'Enter' && handleExamSelection()
               }),
               h('button', {
-                onClick:handleExamSelection,
-                className:'w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition mb-2'
+                onClick: handleExamSelection,
+                className: 'w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition mb-2'
               }, 'Start Exam'),
               h('button', {
-                onClick:resetApp,
-                className:'w-full px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50'
+                onClick: resetApp,
+                className: 'w-full px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50'
               }, 'Back')
             ),
-            h('div', {className:'mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4'},
-              h('p', {className:'text-xs text-blue-800 font-semibold mb-2'}, '💡 Tip: Ask your teacher for the exam name'),
-              h('p', {className:'text-xs text-blue-600'}, 'Exam names are usually lowercase with dashes (e.g., genesis-quiz, hebrews-chapter-1)')
+            h('div', { className: 'mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4' },
+              h('p', { className: 'text-xs text-blue-800 font-semibold mb-2' }, '💡 Tip: Ask your teacher for the exam name'),
+              h('p', { className: 'text-xs text-blue-600' }, 'Exam names are usually lowercase with dashes (e.g., genesis-quiz)')
             )
           )
         );
@@ -617,29 +748,29 @@
 
       // ADMIN PASSWORD VIEW
       if (view === 'admin-password') {
-        return h('div', {className:'min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4'},
-          h('div', {className:'bg-white rounded-2xl shadow-xl p-8 w-full max-w-md'},
-            h('div', {className:'text-center mb-8'},
-              h('div', {className:'bg-red-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4'}, icons.alert),
-              h('h2', {className:'text-2xl font-bold text-gray-800'}, 'Admin Access'),
-              h('p', {className:'text-gray-600 mt-2'}, 'Enter admin password')
+        return h('div', { className: 'min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4' },
+          h('div', { className: 'bg-white rounded-2xl shadow-xl p-8 w-full max-w-md' },
+            h('div', { className: 'text-center mb-8' },
+              h('div', { className: 'bg-red-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4' }, icons.alert),
+              h('h2', { className: 'text-2xl font-bold text-gray-800' }, 'Admin Access'),
+              h('p', { className: 'text-gray-600 mt-2' }, 'Enter admin password')
             ),
             h('div', null,
               h('input', {
-                type:'password',
-                value:passwordInput,
-                onChange:(e)=>setPasswordInput(e.target.value),
-                placeholder:'Password',
-                className:'w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500 mb-4',
-                onKeyPress:(e)=>e.key==='Enter'&&handleAdminLogin()
+                type: 'password',
+                value: passwordInput,
+                onChange: (e) => setPasswordInput(e.target.value),
+                placeholder: 'Password',
+                className: 'w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500 mb-4',
+                onKeyPress: (e) => e.key === 'Enter' && handleAdminLogin()
               }),
               h('button', {
-                onClick:handleAdminLogin,
-                className:'w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition mb-2'
+                onClick: handleAdminLogin,
+                className: 'w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition mb-2'
               }, 'Login as Admin'),
               h('button', {
-                onClick:resetApp,
-                className:'w-full px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50'
+                onClick: resetApp,
+                className: 'w-full px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50'
               }, 'Back')
             )
           )
@@ -648,163 +779,162 @@
 
       // ADMIN DASHBOARD
       if (view === 'admin' && isAdmin) {
-        return h('div', {className:'min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4'},
-          h('div', {className:'max-w-6xl mx-auto'},
-            h('div', {className:'bg-white rounded-2xl shadow-xl p-8'},
-              // Header Section
-              h('div', {className:'flex justify-between items-center mb-6'},
-                h('h1', {className:'text-3xl font-bold text-gray-800'}, 'Teacher Dashboard'),
-                h('button', {onClick:resetApp,className:'px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600'}, 'Logout')
+        return h('div', { className: 'min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4' },
+          h('div', { className: 'max-w-6xl mx-auto' },
+            h('div', { className: 'bg-white rounded-2xl shadow-xl p-8' },
+              // Header
+              h('div', { className: 'flex justify-between items-center mb-6' },
+                h('h1', { className: 'text-3xl font-bold text-gray-800' }, 'Teacher Dashboard'),
+                h('button', { onClick: resetApp, className: 'px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600' }, 'Logout')
               ),
 
-              // Token Setup Section (MOVED OUTSIDE HEADER)
-
-              // Token Setup Section - FIXED VERSION
-              (!githubToken || githubToken === '') && h('div', {className:'bg-red-50 border-2 border-red-200 rounded-xl p-6 mb-6'},
-                h('h2', {className:'text-xl font-bold text-red-800 mb-4'}, '🔐 GitHub Token Required'),
-                h('p', {className:'text-sm text-gray-700 mb-4'}, 'To upload exams to GitHub, you need to enter your Personal Access Token once. It will be saved securely in your browser.'),
+              // GitHub Token Setup
+              (!githubToken || githubToken === '') && h('div', { className: 'bg-red-50 border-2 border-red-200 rounded-xl p-6 mb-6' },
+                h('h2', { className: 'text-xl font-bold text-red-800 mb-4 flex items-center gap-2' }, icons.key, ' GitHub Token Setup'),
+                h('p', { className: 'text-sm text-gray-700 mb-4' }, 'Enter your GitHub Personal Access Token to enable exam uploads and result syncing'),
                 h('input', {
-                  type:'password',
-                  value:githubToken,
-                  onChange:(e)=>setGithubToken(e.target.value),
-                  placeholder:'Paste your GitHub token here (starts with ghp_)',
-                  className:'w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-red-500 mb-3'
+                  type: 'password',
+                  value: githubToken,
+                  onChange: (e) => setGithubToken(e.target.value),
+                  placeholder: 'Paste your GitHub token here (starts with ghp_)',
+                  className: 'w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-red-500 mb-3'
                 }),
                 h('button', {
-                  onClick:()=>{
+                  onClick: () => {
                     const token = githubToken.trim();
-                    if(!token){
+                    if (!token) {
                       alert('Please paste your GitHub token first!');
                       return;
                     }
-                    if(!token.startsWith('ghp_') && !token.startsWith('github_pat_')){
-                      alert('Invalid token format! GitHub tokens start with "ghp_" or "github_pat_"');
+                    if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) {
+                      alert('Invalid token format! Should start with ghp_ or github_pat_');
                       return;
                     }
-                    // Save to localStorage
                     saveGitHubToken(token);
-                    // Update state to force re-render
                     setGithubToken(token);
-                    // Verify it was saved
-                    const savedToken = getGitHubToken();
-                    if(savedToken === token){
-                      alert('✓ Token saved successfully!\n\nYou can now upload exam files.\n\nToken length: ' + token.length + ' characters');
-                    } else {
-                      alert('❌ Failed to save token. Please try again.');
-                    }
+                    alert('✓ Token saved successfully!');
                   },
-                  className:'w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700'
+                  className: 'w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700'
                 }, 'Save Token')
               ),
 
-              // Upload Section
-              h('div', {className:'bg-blue-50 border-2 border-blue-200 rounded-xl p-6 mb-6'},
-                h('h2', {className:'text-xl font-bold text-gray-800 mb-4'}, '📤 Upload Exam to GitHub'),
-                h('div', {className:'bg-white rounded-lg p-4 mb-4'},
-                  h('p', {className:'text-sm text-gray-600 mb-3'}, 'Upload a JSON file containing exam questions. It will be stored in GitHub for all students to access.'),
-                  isUploading && h('div', {className:'mb-3'},
-                    h('p', {className:'text-indigo-600 font-semibold'}, '⏳ Uploading to GitHub...')
-                  ),
-                  h('label', {className:'block'},
-                    h('div', {className:'flex items-center gap-2 mb-2'},
+              // Upload Exam Section
+              h('div', { className: 'bg-blue-50 border-2 border-blue-200 rounded-xl p-6 mb-6' },
+                h('h2', { className: 'text-xl font-bold text-gray-800 mb-4' }, '📤 Upload Exam to GitHub'),
+                h('div', { className: 'bg-white rounded-lg p-4' },
+                  h('p', { className: 'text-sm text-gray-600 mb-3' }, 'Upload a JSON file containing exam questions'),
+                  isUploading && h('p', { className: 'text-indigo-600 font-semibold mb-2' }, '⏳ Uploading...'),
+                  h('label', { className: 'block' },
+                    h('div', { className: 'flex items-center gap-2 mb-2' },
                       icons.upload,
-                      h('span', {className:'font-semibold text-gray-700'}, 'Select Exam JSON File')
+                      h('span', { className: 'font-semibold text-gray-700' }, 'Select Exam JSON File')
                     ),
                     h('input', {
-                      type:'file',
-                      accept:'.json',
-                      onChange:handleFileUpload,
-                      disabled:isUploading,
-                      className:'block w-full text-sm text-gray-500 file:mr-4 file:py-3 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer disabled:opacity-50'
+                      type: 'file',
+                      accept: '.json',
+                      onChange: handleFileUpload,
+                      disabled: isUploading,
+                      className: 'block w-full text-sm'
                     })
                   )
                 )
               ),
 
-              // Available Exams Section
-              availableExams.length > 0 && h('div', {className:'bg-purple-50 border-2 border-purple-200 rounded-xl p-6 mb-6'},
-                h('div', {className:'flex justify-between items-center mb-4'},
-                  h('h2', {className:'text-xl font-bold text-gray-800'}, '📚 Available Exams on GitHub'),
-                  h('button', {
-                    onClick:fetchAvailableExams,
-                    className:'px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200'
-                  }, '🔄 Refresh')
+              // Upload CSV Section
+              h('div', { className: 'bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 mb-6' },
+                h('h2', { className: 'text-xl font-bold text-gray-800 mb-4' }, '📊 Upload Results CSV'),
+                h('p', { className: 'text-sm text-gray-700 mb-4' }, 
+                  'Download CSV from Google Sheet and upload here to sync results to GitHub'
                 ),
-                h('div', {className:'bg-white rounded-lg p-4'},
-                  h('div', {className:'grid gap-2'},
-                    availableExams.map((exam, idx) =>
-                      h('div', {key:idx, className:'flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200'},
-                        h('div', null,
-                          h('p', {className:'font-semibold text-gray-800'}, exam.name),
-                          h('p', {className:'text-xs text-gray-500'}, 'Students should enter: ' + exam.name)
-                        ),
-                        h('span', {className:'text-green-600 text-sm'}, '✓ Available')
-                      )
+                h('ol', { className: 'text-sm text-gray-700 mb-4 ml-4 space-y-1' },
+                  h('li', null, '1. Open your Google Sheet'),
+                  h('li', null, '2. Click "File" → "Download" → "CSV"'),
+                  h('li', null, '3. Select the CSV file below'),
+                  h('li', null, '4. Results auto-upload to GitHub')
+                ),
+                h('div', { className: 'space-y-2' },
+                  h('label', { className: 'block' },
+                    h('div', { className: 'flex items-center gap-2 px-4 py-3 bg-white border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50' },
+                      h('span', { className: 'font-semibold text-gray-700' }, '📁 Choose CSV File'),
+                      h('input', {
+                        type: 'file',
+                        accept: '.csv',
+                        onChange: handleCSVUpload,
+                        disabled: isSyncing,
+                        className: 'hidden'
+                      })
                     )
-                  )
+                  ),
+                  isSyncing && h('p', { className: 'text-indigo-600 font-semibold' }, '⏳ Processing CSV and uploading...')
                 )
               ),
-              
-              // Results Section
-              h('div', {className:'bg-green-50 border-2 border-green-200 rounded-xl p-6'},
-                h('div', {className:'flex justify-between items-center mb-4'},
-                  h('h2', {className:'text-xl font-bold text-gray-800'}, '📊 Student Results'),
-                  allResults.length > 0 && h('div', {className:'flex gap-2'},
-                    h('button', {onClick:exportToExcel,className:'flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700'},
-                      icons.download, ' Export Excel'
-                    ),
-                    h('button', {onClick:clearAllResults,className:'flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700'},
-                      icons.trash, ' Clear All'
-                    )
-                  )
+
+              // Available Exams
+              availableExams.length > 0 && h('div', { className: 'bg-purple-50 border-2 border-purple-200 rounded-xl p-6 mb-6' },
+                h('div', { className: 'flex justify-between items-center mb-4' },
+                  h('h2', { className: 'text-xl font-bold text-gray-800' }, '📚 Available Exams'),
+                  h('button', {
+                    onClick: fetchAvailableExams,
+                    className: 'px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200'
+                  }, '🔄 Refresh')
                 ),
-                allResults.length === 0 ? h('div', {className:'text-center py-12'},
-                  h('div', {className:'mx-auto mb-4 text-gray-400'}, icons.alert),
-                  h('p', {className:'text-gray-500 text-lg'}, 'No student results yet')
-                ) : h('div', {className:'bg-white rounded-lg overflow-hidden'},
-                  h('div', {className:'overflow-x-auto'},
-                    h('table', {className:'w-full'},
-                      h('thead', {className:'bg-gray-100'},
-                        h('tr', null,
-                          h('th', {className:'px-4 py-3 text-left font-semibold'}, 'Rank'),
-                          h('th', {className:'px-4 py-3 text-left font-semibold'}, 'Student Name'),
-                          h('th', {className:'px-4 py-3 text-left font-semibold'}, 'Exam Name'),
-                          h('th', {className:'px-4 py-3 text-left font-semibold'}, 'Marks'),
-                          h('th', {className:'px-4 py-3 text-left font-semibold'}, 'Percentage'),
-                          h('th', {className:'px-4 py-3 text-left font-semibold'}, 'Date & Time')
-                        )
-                      ),
-                      h('tbody', null,
-                        allResults.sort((a,b)=>a.rank-b.rank).map((result,idx)=>
-                          h('tr', {key:idx,className:'border-b hover:bg-gray-50'},
-                            h('td', {className:'px-4 py-3'},
-                              h('span', {className:`font-bold ${result.rank===1?'text-yellow-600':result.rank===2?'text-gray-500':result.rank===3?'text-orange-600':'text-gray-800'}`},
-                                '#' + result.rank
-                              )
-                            ),
-                            h('td', {className:'px-4 py-3 font-medium'}, result.studentName),
-                            h('td', {className:'px-4 py-3 text-gray-600'}, result.examName),
-                            h('td', {className:'px-4 py-3 font-semibold'}, result.marks),
-                            h('td', {className:'px-4 py-3'},
-                              h('span', {className:`font-semibold ${parseFloat(result.percentage)>=70?'text-green-600':parseFloat(result.percentage)>=50?'text-yellow-600':'text-red-600'}`},
-                                result.percentage + '%'
-                              )
-                            ),
-                            h('td', {className:'px-4 py-3 text-sm text-gray-600'}, result.timestamp)
-                          )
-                        )
-                      )
+                h('div', { className: 'grid gap-2' },
+                  availableExams.map((exam, idx) =>
+                    h('div', { key: idx, className: 'p-3 bg-gray-50 rounded-lg border border-gray-200' },
+                      h('p', { className: 'font-semibold text-gray-800' }, exam.name),
+                      h('span', { className: 'text-green-600 text-sm' }, '✓ Available')
                     )
                   )
                 )
               ),
 
-              // GitHub Setup Info
-              h('div', {className:'mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4'},
-                h('p', {className:'text-xs text-yellow-800 font-semibold mb-2'}, '⚙️ GitHub Configuration'),
-                h('p', {className:'text-xs text-yellow-700'}, `Repository: ${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}`),
-                h('p', {className:'text-xs text-yellow-700'}, `Branch: ${GITHUB_CONFIG.branch}`),
-                h('p', {className:'text-xs text-yellow-700 mt-2'}, githubToken ? '✓ Token configured' : '⚠️ Please enter your GitHub token above')
+              // Results Section
+              h('div', { className: 'bg-green-50 border-2 border-green-200 rounded-xl p-6' },
+                h('div', { className: 'flex justify-between items-center mb-4' },
+                  h('h2', { className: 'text-xl font-bold text-gray-800' }, '📊 Student Results'),
+                  h('div', { className: 'flex gap-2 items-center' },
+                    h('input', {
+                      type: 'text',
+                      value: examFilter,
+                      onChange: (e) => setExamFilter(e.target.value),
+                      placeholder: 'Filter by exam',
+                      className: 'px-3 py-2 border-2 border-gray-300 rounded-lg text-sm'
+                    }),
+                    allResults.length > 0 && h('button', { onClick: exportToExcel, className: 'flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm' },
+                      icons.download, 'Export'
+                    ),
+                    allResults.length > 0 && h('button', { onClick: clearAllResults, className: 'flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm' },
+                      icons.trash, 'Clear'
+                    )
+                  )
+                ),
+                allResults.length === 0 ? h('p', { className: 'text-center text-gray-600 py-12' }, 'No student results yet') :
+                h('div', { className: 'overflow-x-auto' },
+                  h('table', { className: 'w-full text-sm' },
+                    h('thead', { className: 'bg-gray-100' },
+                      h('tr', null,
+                        h('th', { className: 'px-4 py-3 text-left font-semibold' }, 'Rank'),
+                        h('th', { className: 'px-4 py-3 text-left font-semibold' }, 'Student'),
+                        h('th', { className: 'px-4 py-3 text-left font-semibold' }, 'Exam'),
+                        h('th', { className: 'px-4 py-3 text-left font-semibold' }, 'Marks'),
+                        h('th', { className: 'px-4 py-3 text-left font-semibold' }, 'Percentage'),
+                        h('th', { className: 'px-4 py-3 text-left font-semibold' }, 'Date & Time')
+                      )
+                    ),
+                    h('tbody', null,
+                      filteredResults.sort((a, b) => (a.rank || 999) - (b.rank || 999)).map((r, i) =>
+                        h('tr', { key: i, className: 'border-b hover:bg-gray-50' },
+                          h('td', { className: 'px-4 py-3 font-bold text-indigo-600' }, '#' + (r.rank || '-')),
+                          h('td', { className: 'px-4 py-3 font-medium' }, r.studentName),
+                          h('td', { className: 'px-4 py-3' }, r.examName),
+                          h('td', { className: 'px-4 py-3 font-semibold' }, r.marks),
+                          h('td', { className: 'px-4 py-3 font-semibold text-green-600' }, r.percentage + '%'),
+                          h('td', { className: 'px-4 py-3 text-xs' }, r.timestamp)
+                        )
+                      )
+                    )
+                  )
+                )
               )
             )
           )
@@ -816,61 +946,60 @@
         const question = examData.questions[currentQuestion];
         const progress = ((currentQuestion + 1) / examData.questions.length) * 100;
 
-        return h('div', {className:'min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4'},
-          h('div', {className:'max-w-4xl mx-auto'},
-            h('div', {className:'bg-white rounded-t-2xl shadow-xl p-6'},
-              h('div', {className:'flex justify-between items-center mb-4'},
+        return h('div', { className: 'min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4' },
+          h('div', { className: 'max-w-4xl mx-auto' },
+            h('div', { className: 'bg-white rounded-t-2xl shadow-xl p-6' },
+              h('div', { className: 'flex justify-between items-center mb-4' },
                 h('div', null,
-                  h('h2', {className:'text-2xl font-bold text-gray-800'}, examData.examName),
-                  h('p', {className:'text-gray-600'}, 'Student: ' + studentName)
+                  h('h2', { className: 'text-2xl font-bold text-gray-800' }, examData.examName),
+                  h('p', { className: 'text-gray-600' }, 'Student: ' + studentName)
                 ),
-                h('div', {className:'flex items-center gap-2 bg-red-100 px-4 py-2 rounded-lg'},
+                h('div', { className: 'flex items-center gap-2 bg-red-100 px-4 py-2 rounded-lg' },
                   icons.clock,
-                  h('span', {className:'text-2xl font-bold text-red-600'}, formatTime(timeLeft))
+                  h('span', { className: 'text-2xl font-bold text-red-600' }, formatTime(timeLeft))
                 )
               ),
-              h('div', {className:'w-full bg-gray-200 rounded-full h-2'},
-                h('div', {className:'bg-indigo-600 h-2 rounded-full transition-all',style:{width:progress+'%'}})
+              h('div', { className: 'w-full bg-gray-200 rounded-full h-2' },
+                h('div', { className: 'bg-indigo-600 h-2 rounded-full transition-all', style: { width: progress + '%' } })
               ),
-              h('p', {className:'text-sm text-gray-600 mt-2'}, `Question ${currentQuestion + 1} of ${examData.questions.length}`)
+              h('p', { className: 'text-sm text-gray-600 mt-2' }, `Question ${currentQuestion + 1} of ${examData.questions.length}`)
             ),
-            h('div', {className:'bg-white shadow-xl p-8 mb-4'},
-              h('div', {className:'flex items-start justify-between gap-4 mb-6'},
-                h('h3', {className:'text-xl font-semibold text-gray-800 flex-1'}, question.question),
+            h('div', { className: 'bg-white shadow-xl p-8 mb-4' },
+              h('div', { className: 'flex items-start justify-between gap-4 mb-6' },
+                h('h3', { className: 'text-xl font-semibold text-gray-800 flex-1' }, question.question),
                 h('button', {
-                  onClick:()=>speakQuestion(question.question),
-                  className:`flex-shrink-0 p-3 rounded-full transition ${isSpeaking?'bg-red-100 hover:bg-red-200':'bg-indigo-100 hover:bg-indigo-200'}`,
-                  title:isSpeaking?'Stop reading':'Read question aloud'
+                  onClick: () => speakQuestion(question.question),
+                  className: `flex-shrink-0 p-3 rounded-full transition ${isSpeaking ? 'bg-red-100' : 'bg-indigo-100'}`
                 }, isSpeaking ? icons.volumeX : icons.volume)
               ),
-              h('div', {className:'space-y-3'},
-                question.options.map((option,idx)=>
+              h('div', { className: 'space-y-3' },
+                question.options.map((option, idx) =>
                   h('button', {
-                    key:idx,
-                    onClick:()=>handleAnswerSelect(currentQuestion,idx),
-                    className:`w-full text-left px-6 py-4 rounded-lg border-2 transition ${answers[currentQuestion]===idx?'border-indigo-600 bg-indigo-50 font-semibold':'border-gray-300 hover:border-indigo-300 hover:bg-gray-50'}`
+                    key: idx,
+                    onClick: () => handleAnswerSelect(currentQuestion, idx),
+                    className: `w-full text-left px-6 py-4 rounded-lg border-2 transition ${answers[currentQuestion] === idx ? 'border-indigo-600 bg-indigo-50' : 'border-gray-300 hover:border-indigo-300'}`
                   },
-                    h('span', {className:'font-semibold text-indigo-600 mr-3'}, String.fromCharCode(65+idx)+'.'),
+                    h('span', { className: 'font-semibold text-indigo-600 mr-3' }, String.fromCharCode(65 + idx) + '.'),
                     option
                   )
                 )
               )
             ),
-            h('div', {className:'bg-white rounded-b-2xl shadow-xl p-6 flex justify-between'},
+            h('div', { className: 'bg-white rounded-b-2xl shadow-xl p-6 flex justify-between' },
               h('button', {
-                onClick:()=>setCurrentQuestion(Math.max(0,currentQuestion-1)),
-                disabled:currentQuestion===0,
-                className:'px-6 py-2 bg-gray-300 text-gray-700 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-400'
+                onClick: () => setCurrentQuestion(Math.max(0, currentQuestion - 1)),
+                disabled: currentQuestion === 0,
+                className: 'px-6 py-2 bg-gray-300 text-gray-700 rounded-lg font-semibold disabled:opacity-50'
               }, 'Previous'),
-              currentQuestion < examData.questions.length-1 ?
+              currentQuestion < examData.questions.length - 1 ?
                 h('button', {
-                  onClick:()=>setCurrentQuestion(currentQuestion+1),
-                  className:'px-6 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700'
+                  onClick: () => setCurrentQuestion(currentQuestion + 1),
+                  className: 'px-6 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700'
                 }, 'Next') :
                 h('button', {
-                  onClick:handleSubmit,
-                  className:'px-6 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 flex items-center gap-2'
-                }, icons.check, ' Submit Exam')
+                  onClick: handleSubmit,
+                  className: 'px-6 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700'
+                }, 'Submit')
             )
           )
         );
@@ -879,45 +1008,42 @@
       // RESULTS VIEW
       if (view === 'results') {
         const result = calculateScore();
-        const myResult = allResults.find(r => 
-          r.studentName === studentName && 
-          r.examName === (examData?.examName || 'Untitled Exam')
-        );
 
-        return h('div', {className:'min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4'},
-          h('div', {className:'bg-white rounded-2xl shadow-xl p-8 w-full max-w-2xl'},
-            h('div', {className:'text-center mb-8'},
-              h('div', {className:`w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 ${
-                Number(result?.percentage) >= 70 ? 'bg-green-100' : Number(result?.percentage) >= 50 ? 'bg-yellow-100' : 'bg-red-100'
-              }`}, 
+        return h('div', { className: 'min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4' },
+          h('div', { className: 'bg-white rounded-2xl shadow-xl p-8 w-full max-w-2xl' },
+            h('div', { className: 'text-center mb-8' },
+              h('div', { className: `w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 ${Number(result?.percentage) >= 70 ? 'bg-green-100' : 'bg-yellow-100'}` },
                 icons.check
               ),
-              h('h2', {className:'text-3xl font-bold text-gray-800 mb-2'}, 'Exam Completed!'),
-              h('p', {className:'text-gray-600'}, studentName)
+              h('h2', { className: 'text-3xl font-bold text-gray-800 mb-2' }, 'Exam Completed!'),
+              h('p', { className: 'text-gray-600' }, studentName)
             ),
-            h('div', {className:'bg-gray-50 rounded-xl p-6 mb-6'},
-              h('div', {className:'grid grid-cols-2 md:grid-cols-4 gap-6'},
-                h('div', {className:'text-center'},
-                  h('p', {className:'text-gray-600 mb-2'}, 'Score'),
-                  h('p', {className:'text-3xl font-bold text-indigo-600'}, `${result?.score || 0}/${result?.total || 0}`)
+            h('div', { className: 'bg-gray-50 rounded-xl p-6 mb-6' },
+              h('div', { className: 'grid grid-cols-2 md:grid-cols-4 gap-6' },
+                h('div', { className: 'text-center' },
+                  h('p', { className: 'text-gray-600 mb-2' }, 'Score'),
+                  h('p', { className: 'text-3xl font-bold text-indigo-600' }, `${result?.score}/${result?.total}`)
                 ),
-                h('div', {className:'text-center'},
-                  h('p', {className:'text-gray-600 mb-2'}, 'Percentage'),
-                  h('p', {className:'text-3xl font-bold text-indigo-600'}, `${Number(result?.percentage) || 0}%`)
+                h('div', { className: 'text-center' },
+                  h('p', { className: 'text-gray-600 mb-2' }, 'Percentage'),
+                  h('p', { className: 'text-3xl font-bold text-indigo-600' }, `${result?.percentage}%`)
                 ),
-                h('div', {className:'text-center'},
-                  h('p', {className:'text-gray-600 mb-2'}, 'Exam'),
-                  h('p', {className:'text-lg font-semibold text-gray-800'}, examData?.examName || 'Unknown Exam')
+                h('div', { className: 'text-center' },
+                  h('p', { className: 'text-gray-600 mb-2' }, 'Exam'),
+                  h('p', { className: 'text-lg font-semibold' }, examData?.examName)
                 ),
-                h('div', {className:'text-center'},
-                  h('p', {className:'text-gray-600 mb-2'}, 'Your Rank'),
-                  h('p', {className:'text-3xl font-bold text-purple-600'}, '#'+(myResult?.rank || '-'))
+                h('div', { className: 'text-center' },
+                  h('p', { className: 'text-gray-600 mb-2' }, 'Status'),
+                  h('p', { className: 'text-lg font-bold text-green-600' }, '✓ Submitted')
                 )
               )
             ),
+            h('div', { className: 'bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6' },
+              h('p', { className: 'text-sm text-blue-800' }, '✓ Your results have been submitted to Google Form and will be synced by your teacher.')
+            ),
             h('button', {
-              onClick:resetApp,
-              className:'w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700'
+              onClick: resetApp,
+              className: 'w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700'
             }, 'Back to Home')
           )
         );
