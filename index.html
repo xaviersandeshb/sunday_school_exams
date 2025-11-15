@@ -18,14 +18,13 @@
   <div id="root"></div>
 
   <script>
-    const { useState, useEffect, useCallback, createElement: h } = React;
+    const { useState, useEffect, useCallback, useRef, createElement: h } = React;
     const { createRoot } = ReactDOM;
 
-    // GOOGLE SHEETS CONFIG
+    // GOOGLE SHEETS CONFIG (Backup)
     const GOOGLE_CONFIG = {
       sheetId: '1Bm8T6sp8Y1J-Qw4yTCC22DDRmYBFukMVLM_v_f8wtIw',
       formUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSciPMSBYpCzmDDz59rhh-jvZpgQfyNQT0WEvqFerWi9rMBftg/formResponse',
-      formId: '1FAIpQLSciPMSBYpCzmDDz59rhh-jvZpgQfyNQT0WEvqFerWi9rMBftg',
       entryIds: {
         studentName: '157339701',
         examName: '879024982',
@@ -39,9 +38,12 @@
     const GITHUB_CONFIG = {
       username: 'xaviersandeshb',
       repo: 'sunday_school_exams',
-      token: '',
+      token: '', // Admin token
       branch: 'main'
     };
+
+    // PUBLIC RESULTS TOKEN (Fine-grained - can only write to results.json)
+    const PUBLIC_RESULTS_TOKEN = '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'; // ← REPLACE THIS
 
     const getGitHubToken = () => localStorage.getItem('github_token') || GITHUB_CONFIG.token;
     const saveGitHubToken = (token) => localStorage.setItem('github_token', token);
@@ -64,16 +66,308 @@
       const [githubToken, setGithubToken] = useState('');
       const [examFilter, setExamFilter] = useState('');
       const [isSyncing, setIsSyncing] = useState(false);
+      const [pendingResults, setPendingResults] = useState([]);
 
       const adminPassword = 'admin123';
 
-      // Load token on mount
+      // Helper: Format time
+      const formatTime = (seconds) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+      };
+
+      // ============================================
+      // AUTO-SAVE EXAM PROGRESS (PRODUCTION VERSION)
+      // ============================================
+
+      const hasCheckedResumeRef = useRef(false);
+
+      const clearExamProgress = useCallback(() => {
+        localStorage.removeItem('exam-in-progress');
+        hasCheckedResumeRef.current = false;
+      }, []);
+
+      useEffect(() => {
+        if (examStarted && examData && studentName) {
+          const examProgress = {
+            studentName,
+            examName,
+            examData,
+            currentQuestion,
+            answers,
+            timeLeft,
+            examStarted: true,
+            savedAt: new Date().toISOString()
+          };
+          
+          try {
+            localStorage.setItem('exam-in-progress', JSON.stringify(examProgress));
+          } catch (error) {
+            console.error('Failed to auto-save:', error);
+          }
+        }
+      }, [examStarted, examData, currentQuestion, answers, timeLeft, studentName, examName]);
+
+      useEffect(() => {
+        if (hasCheckedResumeRef.current) return;
+        
+        const checkAndResumeExam = () => {
+          const savedExam = localStorage.getItem('exam-in-progress');
+          
+          if (!savedExam) {
+            hasCheckedResumeRef.current = true;
+            return;
+          }
+          
+          try {
+            const progress = JSON.parse(savedExam);
+            
+            if (!progress.examData || !progress.examData.questions || !progress.studentName) {
+              localStorage.removeItem('exam-in-progress');
+              hasCheckedResumeRef.current = true;
+              return;
+            }
+            
+            const savedTime = new Date(progress.savedAt);
+            const now = new Date();
+            const elapsedMinutes = (now - savedTime) / 1000 / 60;
+            
+            if (elapsedMinutes >= 120) {
+              localStorage.removeItem('exam-in-progress');
+              hasCheckedResumeRef.current = true;
+              return;
+            }
+            
+            const totalQuestions = progress.examData.questions.length;
+            const answeredCount = Object.keys(progress.answers || {}).length;
+            
+            const message = 
+              `📝 EXAM IN PROGRESS FOUND!\n\n` +
+              `Student: ${progress.studentName}\n` +
+              `Exam: ${progress.examName}\n` +
+              `Progress: ${progress.currentQuestion + 1}/${totalQuestions}\n` +
+              `Answered: ${answeredCount} questions\n` +
+              `Time left: ${formatTime(progress.timeLeft)}\n\n` +
+              `Resume this exam?`;
+            
+            const shouldResume = confirm(message);
+            hasCheckedResumeRef.current = true;
+            
+            if (shouldResume) {
+              setStudentName(progress.studentName);
+              setExamName(progress.examName);
+              setExamData(progress.examData);
+              setCurrentQuestion(progress.currentQuestion);
+              setAnswers(progress.answers || {});
+              setTimeLeft(progress.timeLeft);
+              setExamStarted(true);
+              setView('exam');
+            } else {
+              localStorage.removeItem('exam-in-progress');
+            }
+            
+          } catch (error) {
+            console.error('Failed to parse saved exam:', error);
+            localStorage.removeItem('exam-in-progress');
+            hasCheckedResumeRef.current = true;
+          }
+        };
+        
+        const timeoutId = setTimeout(checkAndResumeExam, 300);
+        return () => clearTimeout(timeoutId);
+      }, []);
+
+      // ============================================
+      // DUAL SUBMISSION: GitHub (Primary) + Google Sheet (Backup)
+      // ============================================
+
+      // Submit to GitHub (Primary)
+      const submitResultToGitHub = async (result) => {
+        try {
+          console.log('📤 Submitting to GitHub...');
+          
+          const url = `https://api.github.com/repos/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/contents/results.json`;
+          
+          let existingResults = [];
+          let sha = null;
+          
+          try {
+            const response = await fetch(url, {
+              headers: { 
+                'Authorization': `token ${PUBLIC_RESULTS_TOKEN}`,
+                'Accept': 'application/vnd.github.v3+json'
+              }
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              existingResults = JSON.parse(atob(data.content));
+              sha = data.sha;
+              console.log('📥 Loaded existing results:', existingResults.length);
+            }
+          } catch (e) {
+            console.log('📄 Creating new results file');
+          }
+          
+          existingResults.push(result);
+          
+          // Calculate ranks per exam
+          const examGroups = {};
+          existingResults.forEach(r => {
+            if (!examGroups[r.examName]) examGroups[r.examName] = [];
+            examGroups[r.examName].push(r);
+          });
+          
+          const rankedResults = [];
+          Object.keys(examGroups).forEach(exam => {
+            const sorted = examGroups[exam].sort((a, b) => 
+              parseFloat(b.percentage || 0) - parseFloat(a.percentage || 0)
+            );
+            sorted.forEach((r, idx) => {
+              rankedResults.push({ ...r, rank: idx + 1 });
+            });
+          });
+          
+          const body = {
+            message: `Add: ${result.studentName} - ${result.examName} (${result.percentage}%)`,
+            content: btoa(unescape(encodeURIComponent(JSON.stringify(rankedResults, null, 2)))),
+            branch: GITHUB_CONFIG.branch
+          };
+          if (sha) body.sha = sha;
+          
+          const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `token ${PUBLIC_RESULTS_TOKEN}`,
+              'Content-Type': 'application/json',
+              'Accept': 'application/vnd.github.v3+json'
+            },
+            body: JSON.stringify(body)
+          });
+          
+          if (!response.ok) throw new Error('GitHub upload failed');
+          
+          console.log('✓ GitHub submission successful');
+          return true;
+          
+        } catch (error) {
+          console.error('❌ GitHub error:', error);
+          
+          // Save to pending for retry
+          const pending = JSON.parse(localStorage.getItem('pending-results') || '[]');
+          pending.push({ ...result, synced: false, savedAt: new Date().toISOString() });
+          localStorage.setItem('pending-results', JSON.stringify(pending));
+          
+          return false;
+        }
+      };
+
+      // Submit to Google Sheet (Backup)
+      const submitToGoogleSheet = async (result) => {
+        try {
+          const formData = new FormData();
+          formData.append(`entry.${GOOGLE_CONFIG.entryIds.studentName}`, result.studentName);
+          formData.append(`entry.${GOOGLE_CONFIG.entryIds.examName}`, result.examName);
+          formData.append(`entry.${GOOGLE_CONFIG.entryIds.marks}`, result.marks);
+          formData.append(`entry.${GOOGLE_CONFIG.entryIds.percentage}`, result.percentage);
+          formData.append(`entry.${GOOGLE_CONFIG.entryIds.timestamp}`, result.timestamp);
+
+          await fetch(GOOGLE_CONFIG.formUrl, {
+            method: 'POST',
+            body: formData,
+            mode: 'no-cors'
+          });
+
+          console.log('✓ Google Sheet backup successful');
+          return true;
+        } catch (error) {
+          console.error('⚠️ Google Sheet backup failed:', error);
+          return false;
+        }
+      };
+
+      // Dual submission
+      const submitResult = async (result) => {
+        const githubSuccess = await submitResultToGitHub(result);
+        const googleSuccess = await submitToGoogleSheet(result);
+        
+        if (githubSuccess && googleSuccess) {
+          console.log('✅ Both submissions successful');
+        } else if (githubSuccess) {
+          console.log('✓ GitHub successful, Google backup failed');
+        } else if (googleSuccess) {
+          console.log('⚠️ GitHub failed but Google backup successful');
+        } else {
+          console.log('❌ Both submissions failed - saved for retry');
+        }
+        
+        return githubSuccess;
+      };
+
+      // ============================================
+      // AUTO-RETRY FAILED SUBMISSIONS
+      // ============================================
+
+      useEffect(() => {
+        const retryPendingSubmissions = async () => {
+          const pending = JSON.parse(localStorage.getItem('pending-results') || '[]');
+          
+          if (pending.length === 0) return;
+          
+          console.log(`🔄 Retrying ${pending.length} pending submissions...`);
+          
+          const stillPending = [];
+          let successCount = 0;
+          
+          for (const result of pending) {
+            const success = await submitResultToGitHub(result);
+            if (success) {
+              successCount++;
+              await submitToGoogleSheet(result);
+            } else {
+              stillPending.push(result);
+            }
+          }
+          
+          localStorage.setItem('pending-results', JSON.stringify(stillPending));
+          
+          if (successCount > 0) {
+            console.log(`✓ Successfully synced ${successCount} pending results!`);
+          }
+        };
+        
+        setTimeout(retryPendingSubmissions, 2000);
+        
+        const handleOnline = () => {
+          console.log('🌐 Internet reconnected, retrying...');
+          setTimeout(retryPendingSubmissions, 1000);
+        };
+        
+        window.addEventListener('online', handleOnline);
+        return () => window.removeEventListener('online', handleOnline);
+      }, []);
+
+      // Check pending results periodically
+      useEffect(() => {
+        const checkPending = () => {
+          const pending = JSON.parse(localStorage.getItem('pending-results') || '[]');
+          setPendingResults(pending);
+        };
+        checkPending();
+        const interval = setInterval(checkPending, 3000);
+        return () => clearInterval(interval);
+      }, [view]);
+
+      // ============================================
+      // EXISTING FUNCTIONS
+      // ============================================
+
       useEffect(() => {
         const savedToken = getGitHubToken();
         if (savedToken) setGithubToken(savedToken);
       }, []);
 
-      // Load results from localStorage
       useEffect(() => {
         try {
           const resultsResult = localStorage.getItem('all-results');
@@ -85,7 +379,6 @@
         }
       }, []);
 
-      // Save results to localStorage
       useEffect(() => {
         if (allResults.length > 0) {
           try {
@@ -96,7 +389,6 @@
         }
       }, [allResults]);
 
-      // Fetch available exams from GitHub
       const fetchAvailableExams = useCallback(async () => {
         try {
           const url = `https://api.github.com/repos/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/contents/exams?ref=${GITHUB_CONFIG.branch}`;
@@ -117,7 +409,6 @@
         }
       }, []);
 
-      // Load exam from GitHub
       const loadExamFromGitHub = async (examFileName) => {
         try {
           const url = `https://raw.githubusercontent.com/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/${GITHUB_CONFIG.branch}/exams/${examFileName}.json`;
@@ -137,92 +428,36 @@
         }
       };
 
-      // Upload results to GitHub
-      const uploadResultsExcel = async (results) => {
+      // Load results from GitHub
+      const loadResultsFromGitHub = async () => {
         try {
-          const token = getGitHubToken();
+          setIsSyncing(true);
           
-          if (!token) {
-            console.log('No token available, skipping upload');
-            return false;
-          }
-
-          const worksheet = XLSX.utils.json_to_sheet(results);
-          const workbook = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(workbook, worksheet, 'Results');
-
-          const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-          const base64 = btoa(String.fromCharCode(...new Uint8Array(wbout)));
-
-          const url = `https://api.github.com/repos/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/contents/results.xlsx`;
-
-          let sha = null;
+          const url = `https://api.github.com/repos/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/contents/results.json`;
           
-          try {
-            const checkResponse = await fetch(url, { 
-              headers: { 'Authorization': `token ${token}` } 
-            });
-            if (checkResponse.ok) {
-              const existingFile = await checkResponse.json();
-              sha = existingFile.sha;
-            }
-          } catch (e) {
-            console.log('File check:', e.message);
-          }
-
-          const body = {
-            message: 'Update exam results from CSV',
-            content: base64,
-            branch: GITHUB_CONFIG.branch
-          };
-          if (sha) body.sha = sha;
-
           const response = await fetch(url, {
-            method: 'PUT',
-            headers: {
-              'Authorization': `token ${token}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(body)
+            headers: { 
+              'Authorization': `token ${PUBLIC_RESULTS_TOKEN}`,
+              'Accept': 'application/vnd.github.v3+json'
+            }
           });
-
-          if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Upload failed');
+          
+          if (response.ok) {
+            const data = await response.json();
+            const results = JSON.parse(atob(data.content));
+            setAllResults(results);
+            alert(`✓ Loaded ${results.length} results from GitHub`);
+          } else {
+            throw new Error('No results found');
           }
-          return true;
+          
+          setIsSyncing(false);
         } catch (error) {
-          console.error('Upload error:', error);
-          alert('Failed to upload to GitHub: ' + error.message);
-          return false;
+          setIsSyncing(false);
+          alert('Could not load results: ' + error.message);
         }
       };
 
-      // Submit exam result to Google Form
-      const submitToGoogleForm = async (studentResult) => {
-        try {
-          const formData = new FormData();
-          formData.append(`entry.${GOOGLE_CONFIG.entryIds.studentName}`, studentResult.studentName);
-          formData.append(`entry.${GOOGLE_CONFIG.entryIds.examName}`, studentResult.examName);
-          formData.append(`entry.${GOOGLE_CONFIG.entryIds.marks}`, studentResult.marks);
-          formData.append(`entry.${GOOGLE_CONFIG.entryIds.percentage}`, studentResult.percentage);
-          formData.append(`entry.${GOOGLE_CONFIG.entryIds.timestamp}`, studentResult.timestamp);
-
-          const response = await fetch(GOOGLE_CONFIG.formUrl, {
-            method: 'POST',
-            body: formData,
-            mode: 'no-cors'
-          });
-
-          console.log('Form submitted successfully');
-          return true;
-        } catch (error) {
-          console.error('Form submission error:', error);
-          return false;
-        }
-      };
-
-      // Upload exam JSON to GitHub
       const uploadToGitHub = async (fileName, content) => {
         try {
           let token = githubToken || getGitHubToken();
@@ -233,12 +468,6 @@
           }
 
           token = token.trim();
-
-          if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) {
-            alert('❌ Invalid token format!');
-            return false;
-          }
-
           setIsUploading(true);
 
           const url = `https://api.github.com/repos/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/contents/exams/${fileName}`;
@@ -266,9 +495,7 @@
             branch: GITHUB_CONFIG.branch
           };
 
-          if (sha) {
-            body.sha = sha;
-          }
+          if (sha) body.sha = sha;
 
           const response = await fetch(url, {
             method: 'PUT',
@@ -287,7 +514,7 @@
             return true;
           } else {
             const error = await response.json();
-            alert('❌ Upload Failed!\n\nError: ' + (error.message || 'Unknown error'));
+            alert('❌ Upload Failed!\n\n' + (error.message || 'Unknown error'));
             return false;
           }
         } catch (error) {
@@ -297,7 +524,6 @@
         }
       };
 
-      // Text-to-speech with Telugu support
       const speakQuestion = (text) => {
         if ('speechSynthesis' in window) {
           window.speechSynthesis.cancel();
@@ -308,45 +534,30 @@
           }
 
           const utterance = new SpeechSynthesisUtterance(text);
-
           const hasTeluguText = /[\u0C00-\u0C7F]/.test(text);
           const voices = window.speechSynthesis.getVoices();
 
           if (hasTeluguText) {
             const teluguVoice = voices.find(voice =>
-              voice.lang.startsWith('te') ||
-              voice.lang === 'te-IN' ||
-              voice.name.toLowerCase().includes('telugu')
+              voice.lang.startsWith('te') || voice.lang === 'te-IN'
             );
-
-            if (teluguVoice) {
-              utterance.voice = teluguVoice;
-              utterance.lang = 'te-IN';
-            } else {
-              utterance.lang = 'te-IN';
-            }
+            if (teluguVoice) utterance.voice = teluguVoice;
+            utterance.lang = 'te-IN';
             utterance.rate = 0.85;
           } else {
             const englishVoice = voices.find(voice =>
               voice.lang === 'en-US' || voice.lang === 'en-GB'
             );
-            if (englishVoice) {
-              utterance.voice = englishVoice;
-            }
+            if (englishVoice) utterance.voice = englishVoice;
             utterance.lang = 'en-US';
             utterance.rate = 0.9;
           }
-
-          utterance.pitch = 1;
-          utterance.volume = 1;
 
           utterance.onstart = () => setIsSpeaking(true);
           utterance.onend = () => setIsSpeaking(false);
           utterance.onerror = () => setIsSpeaking(false);
 
           window.speechSynthesis.speak(utterance);
-        } else {
-          alert('Text-to-speech is not supported in your browser.');
         }
       };
 
@@ -392,7 +603,7 @@
           setCurrentQuestion(0);
           setView('exam');
         } else {
-          alert(`Exam "${examName}" not found. Please check the exam name and try again.`);
+          alert(`Exam "${examName}" not found. Please check the exam name.`);
         }
       };
 
@@ -402,6 +613,7 @@
           setView('admin');
           setPasswordInput('');
           fetchAvailableExams();
+          loadResultsFromGitHub();
         } else {
           alert('Incorrect password!');
         }
@@ -417,101 +629,18 @@
               const json = JSON.parse(content);
 
               if (!json.examName || !json.questions || json.questions.length === 0) {
-                alert('Invalid JSON format. Please check your file.');
+                alert('Invalid JSON format.');
                 return;
               }
 
               const fileName = json.examName.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.json';
-
               const success = await uploadToGitHub(fileName, content);
 
               if (success) {
-                alert(`Exam "${json.examName}" uploaded successfully to GitHub!`);
-              } else {
-                alert('Failed to upload exam to GitHub. Please check your token and try again.');
+                alert(`Exam "${json.examName}" uploaded successfully!`);
               }
             } catch (error) {
-              alert('Error reading file. Please upload a valid JSON file.');
-              console.error(error);
-            }
-          };
-          reader.readAsText(file);
-        }
-      };
-
-      const handleCSVUpload = async (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = async (event) => {
-            try {
-              setIsSyncing(true);
-              const csvText = event.target.result;
-              const results = [];
-              const lines = csvText.split('\n');
-              
-              if (lines.length < 2) {
-                alert('CSV file is empty');
-                setIsSyncing(false);
-                return;
-              }
-              
-              const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-              
-              for (let i = 1; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (!line) continue;
-                
-                const values = line.split(',').map(v => v.trim());
-                
-                const row = {
-                  timestamp: values[headers.indexOf('timestamp')] || '',
-                  studentName: values[headers.indexOf('student name')] || values[headers.indexOf('studentname')] || '',
-                  examName: values[headers.indexOf('exam name')] || values[headers.indexOf('examname')] || '',
-                  marks: values[headers.indexOf('marks')] || '',
-                  percentage: values[headers.indexOf('percentage')] || ''
-                };
-                
-                if (row.studentName && row.examName) {
-                  results.push(row);
-                }
-              }
-              
-              if (results.length === 0) {
-                alert('No valid results in CSV file');
-                setIsSyncing(false);
-                return;
-              }
-              
-              // Rank the results
-              const examGroups = {};
-              results.forEach(r => {
-                if (!examGroups[r.examName]) examGroups[r.examName] = [];
-                examGroups[r.examName].push(r);
-              });
-              
-              const rankedResults = [];
-              Object.keys(examGroups).forEach(exam => {
-                const sorted = examGroups[exam].sort((a, b) => 
-                  parseFloat(b.percentage || 0) - parseFloat(a.percentage || 0)
-                );
-                sorted.forEach((r, idx) => {
-                  rankedResults.push({ ...r, rank: idx + 1, examName: exam });
-                });
-              });
-              
-              // Upload to GitHub
-              const uploaded = await uploadResultsExcel(rankedResults);
-              
-              setIsSyncing(false);
-              
-              if (uploaded) {
-                setAllResults(rankedResults);
-                alert(`✓ Successfully uploaded!\n\nRecords: ${rankedResults.length}\nExams: ${Object.keys(examGroups).length}`);
-              }
-            } catch (error) {
-              setIsSyncing(false);
-              alert('Error processing CSV: ' + error.message);
+              alert('Error reading file.');
             }
           };
           reader.readAsText(file);
@@ -519,10 +648,10 @@
       };
 
       const clearAllResults = async () => {
-        if (confirm('Are you sure you want to delete ALL student results?')) {
+        if (confirm('Delete ALL results?')) {
           setAllResults([]);
           localStorage.removeItem('all-results');
-          alert('All results cleared!');
+          alert('Results cleared!');
         }
       };
 
@@ -551,7 +680,9 @@
       const handleSubmit = useCallback(async () => {
         if (!examData) return;
 
+        clearExamProgress();
         setExamStarted(false);
+        
         const result = calculateScore();
 
         const newResult = {
@@ -562,11 +693,10 @@
           timestamp: new Date().toLocaleString()
         };
 
-        const submitted = await submitToGoogleForm(newResult);
+        const submitted = await submitResult(newResult);
         
         if (!submitted) {
-          alert('⚠️ Could not submit to Google Form. Please try again.');
-          return;
+          console.warn('Primary submission failed, saved for retry');
         }
 
         const updatedResults = [...allResults, newResult];
@@ -586,7 +716,7 @@
 
       const exportToExcel = () => {
         if (typeof XLSX === 'undefined') {
-          alert('Excel export library not loaded. Please refresh the page.');
+          alert('Excel library not loaded.');
           return;
         }
 
@@ -599,17 +729,10 @@
           const worksheet = XLSX.utils.json_to_sheet(allResults);
           const workbook = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(workbook, worksheet, 'Results');
-          XLSX.writeFile(workbook, `Sunday_School_Exam_Results.xlsx`);
+          XLSX.writeFile(workbook, `Exam_Results.xlsx`);
         } catch (error) {
-          console.error('Export error:', error);
-          alert('Failed to export results.');
+          alert('Failed to export.');
         }
-      };
-
-      const formatTime = (seconds) => {
-        const mins = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${mins}:${secs.toString().padStart(2, '0')}`;
       };
 
       const resetApp = () => {
@@ -628,6 +751,30 @@
       const filteredResults = examFilter
         ? allResults.filter(r => r.examName && r.examName.toLowerCase().includes(examFilter.toLowerCase()))
         : allResults;
+
+      // Manual retry pending results
+      const manualRetryPending = async () => {
+        const pending = JSON.parse(localStorage.getItem('pending-results') || '[]');
+        if (pending.length === 0) {
+          alert('No pending submissions');
+          return;
+        }
+        
+        let allSuccess = true;
+        for (const result of pending) {
+          const success = await submitResultToGitHub(result);
+          if (success) await submitToGoogleSheet(result);
+          if (!success) allSuccess = false;
+        }
+        
+        if (allSuccess) {
+          localStorage.setItem('pending-results', '[]');
+          setPendingResults([]);
+          alert('✓ All submissions uploaded!');
+        } else {
+          alert('⚠️ Some uploads failed. Check internet connection.');
+        }
+      };
 
       // Icons
       const icons = {
@@ -678,7 +825,8 @@
           h('path', { d: 'M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z' })
         ),
         key: h('svg', { width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
-          h('path', { d: 'M21 2l-9 4m0 0L5 2m7 4v13m0 0l7 4m-7-4l-7 4' })
+          h('circle', { cx: 12, cy: 12, r: 3 }),
+          h('path', { d: 'M12 1v6m0 6v6m5.7-13.7l-4.3 4.3m-2.8 2.8l-4.3 4.3m12.0-1.4l-4.3-4.3m-2.8-2.8l-4.3-4.3' })
         )
       };
 
@@ -718,7 +866,7 @@
               h('div', { className: 'bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4' }, icons.book),
               h('h2', { className: 'text-2xl font-bold text-gray-800' }, 'Select Exam'),
               h('p', { className: 'text-gray-600 mt-2' }, 'Hello, ' + studentName + '!'),
-              h('p', { className: 'text-sm text-gray-500 mt-1' }, 'Enter the exam name provided by your teacher')
+              h('p', { className: 'text-sm text-gray-500 mt-1' }, 'Enter the exam name')
             ),
             h('div', null,
               h('input', {
@@ -737,10 +885,6 @@
                 onClick: resetApp,
                 className: 'w-full px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50'
               }, 'Back')
-            ),
-            h('div', { className: 'mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4' },
-              h('p', { className: 'text-xs text-blue-800 font-semibold mb-2' }, '💡 Tip: Ask your teacher for the exam name'),
-              h('p', { className: 'text-xs text-blue-600' }, 'Exam names are usually lowercase with dashes (e.g., genesis-quiz)')
             )
           )
         );
@@ -782,52 +926,45 @@
         return h('div', { className: 'min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4' },
           h('div', { className: 'max-w-6xl mx-auto' },
             h('div', { className: 'bg-white rounded-2xl shadow-xl p-8' },
-              // Header
               h('div', { className: 'flex justify-between items-center mb-6' },
                 h('h1', { className: 'text-3xl font-bold text-gray-800' }, 'Teacher Dashboard'),
                 h('button', { onClick: resetApp, className: 'px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600' }, 'Logout')
               ),
 
-              // GitHub Token Setup
               (!githubToken || githubToken === '') && h('div', { className: 'bg-red-50 border-2 border-red-200 rounded-xl p-6 mb-6' },
                 h('h2', { className: 'text-xl font-bold text-red-800 mb-4 flex items-center gap-2' }, icons.key, ' GitHub Token Setup'),
-                h('p', { className: 'text-sm text-gray-700 mb-4' }, 'Enter your GitHub Personal Access Token to enable exam uploads and result syncing'),
+                h('p', { className: 'text-sm text-gray-700 mb-4' }, 'Enter your GitHub token for exam uploads'),
                 h('input', {
                   type: 'password',
                   value: githubToken,
                   onChange: (e) => setGithubToken(e.target.value),
-                  placeholder: 'Paste your GitHub token here (starts with ghp_)',
-                  className: 'w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-red-500 mb-3'
+                  placeholder: 'Paste token (ghp_...)',
+                  className: 'w-full px-4 py-3 border-2 border-gray-300 rounded-lg mb-3'
                 }),
                 h('button', {
                   onClick: () => {
                     const token = githubToken.trim();
                     if (!token) {
-                      alert('Please paste your GitHub token first!');
-                      return;
-                    }
-                    if (!token.startsWith('ghp_') && !token.startsWith('github_pat_')) {
-                      alert('Invalid token format! Should start with ghp_ or github_pat_');
+                      alert('Please paste token!');
                       return;
                     }
                     saveGitHubToken(token);
                     setGithubToken(token);
-                    alert('✓ Token saved successfully!');
+                    alert('✓ Token saved!');
                   },
                   className: 'w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700'
                 }, 'Save Token')
               ),
 
-              // Upload Exam Section
               h('div', { className: 'bg-blue-50 border-2 border-blue-200 rounded-xl p-6 mb-6' },
-                h('h2', { className: 'text-xl font-bold text-gray-800 mb-4' }, '📤 Upload Exam to GitHub'),
+                h('h2', { className: 'text-xl font-bold text-gray-800 mb-4' }, '📤 Upload Exam JSON'),
                 h('div', { className: 'bg-white rounded-lg p-4' },
-                  h('p', { className: 'text-sm text-gray-600 mb-3' }, 'Upload a JSON file containing exam questions'),
+                  h('p', { className: 'text-sm text-gray-600 mb-3' }, 'Upload exam questions'),
                   isUploading && h('p', { className: 'text-indigo-600 font-semibold mb-2' }, '⏳ Uploading...'),
                   h('label', { className: 'block' },
                     h('div', { className: 'flex items-center gap-2 mb-2' },
                       icons.upload,
-                      h('span', { className: 'font-semibold text-gray-700' }, 'Select Exam JSON File')
+                      h('span', { className: 'font-semibold text-gray-700' }, 'Select JSON File')
                     ),
                     h('input', {
                       type: 'file',
@@ -840,36 +977,6 @@
                 )
               ),
 
-              // Upload CSV Section
-              h('div', { className: 'bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 mb-6' },
-                h('h2', { className: 'text-xl font-bold text-gray-800 mb-4' }, '📊 Upload Results CSV'),
-                h('p', { className: 'text-sm text-gray-700 mb-4' }, 
-                  'Download CSV from Google Sheet and upload here to sync results to GitHub'
-                ),
-                h('ol', { className: 'text-sm text-gray-700 mb-4 ml-4 space-y-1' },
-                  h('li', null, '1. Open your Google Sheet'),
-                  h('li', null, '2. Click "File" → "Download" → "CSV"'),
-                  h('li', null, '3. Select the CSV file below'),
-                  h('li', null, '4. Results auto-upload to GitHub')
-                ),
-                h('div', { className: 'space-y-2' },
-                  h('label', { className: 'block' },
-                    h('div', { className: 'flex items-center gap-2 px-4 py-3 bg-white border-2 border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50' },
-                      h('span', { className: 'font-semibold text-gray-700' }, '📁 Choose CSV File'),
-                      h('input', {
-                        type: 'file',
-                        accept: '.csv',
-                        onChange: handleCSVUpload,
-                        disabled: isSyncing,
-                        className: 'hidden'
-                      })
-                    )
-                  ),
-                  isSyncing && h('p', { className: 'text-indigo-600 font-semibold' }, '⏳ Processing CSV and uploading...')
-                )
-              ),
-
-              // Available Exams
               availableExams.length > 0 && h('div', { className: 'bg-purple-50 border-2 border-purple-200 rounded-xl p-6 mb-6' },
                 h('div', { className: 'flex justify-between items-center mb-4' },
                   h('h2', { className: 'text-xl font-bold text-gray-800' }, '📚 Available Exams'),
@@ -888,7 +995,6 @@
                 )
               ),
 
-              // Results Section
               h('div', { className: 'bg-green-50 border-2 border-green-200 rounded-xl p-6' },
                 h('div', { className: 'flex justify-between items-center mb-4' },
                   h('h2', { className: 'text-xl font-bold text-gray-800' }, '📊 Student Results'),
@@ -900,15 +1006,20 @@
                       placeholder: 'Filter by exam',
                       className: 'px-3 py-2 border-2 border-gray-300 rounded-lg text-sm'
                     }),
-                    allResults.length > 0 && h('button', { onClick: exportToExcel, className: 'flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm' },
+                    h('button', {
+                      onClick: loadResultsFromGitHub,
+                      disabled: isSyncing,
+                      className: 'flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm'
+                    }, '🔄 Refresh'),
+                    allResults.length > 0 && h('button', { onClick: exportToExcel, className: 'flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg text-sm' },
                       icons.download, 'Export'
                     ),
-                    allResults.length > 0 && h('button', { onClick: clearAllResults, className: 'flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm' },
+                    allResults.length > 0 && h('button', { onClick: clearAllResults, className: 'flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg text-sm' },
                       icons.trash, 'Clear'
                     )
                   )
                 ),
-                allResults.length === 0 ? h('p', { className: 'text-center text-gray-600 py-12' }, 'No student results yet') :
+                allResults.length === 0 ? h('p', { className: 'text-center text-gray-600 py-12' }, 'No results yet') :
                 h('div', { className: 'overflow-x-auto' },
                   h('table', { className: 'w-full text-sm' },
                     h('thead', { className: 'bg-gray-100' },
@@ -918,7 +1029,7 @@
                         h('th', { className: 'px-4 py-3 text-left font-semibold' }, 'Exam'),
                         h('th', { className: 'px-4 py-3 text-left font-semibold' }, 'Marks'),
                         h('th', { className: 'px-4 py-3 text-left font-semibold' }, 'Percentage'),
-                        h('th', { className: 'px-4 py-3 text-left font-semibold' }, 'Date & Time')
+                        h('th', { className: 'px-4 py-3 text-left font-semibold' }, 'Timestamp')
                       )
                     ),
                     h('tbody', null,
@@ -1038,8 +1149,33 @@
                 )
               )
             ),
+            
+            // PENDING SUBMISSIONS WARNING
+            pendingResults.length > 0 && h('div', { className: 'bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 mb-6' },
+              h('div', { className: 'flex items-center gap-3 mb-3' },
+                h('span', { className: 'text-3xl' }, '⚠️'),
+                h('div', null,
+                  h('h3', { className: 'font-bold text-gray-800' }, 'Upload Pending'),
+                  h('p', { className: 'text-sm text-gray-600' }, 
+                    `${pendingResults.length} result(s) waiting to upload`
+                  )
+                )
+              ),
+              h('p', { className: 'text-sm text-gray-700 mb-3' }, 
+                'Your exam was saved locally but couldn\'t reach the server. It will auto-retry when internet returns.'
+              ),
+              h('button', {
+                onClick: manualRetryPending,
+                className: 'w-full bg-yellow-600 text-white py-3 rounded-lg font-semibold hover:bg-yellow-700'
+              }, '🔄 Retry Upload Now')
+            ),
+            
             h('div', { className: 'bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6' },
-              h('p', { className: 'text-sm text-blue-800' }, '✓ Your results have been submitted to Google Form and will be synced by your teacher.')
+              h('p', { className: 'text-sm text-blue-800' }, 
+                pendingResults.length === 0 
+                  ? '✓ Your results have been submitted successfully!'
+                  : '⏳ Results saved locally. Upload pending...'
+              )
             ),
             h('button', {
               onClick: resetApp,
@@ -1057,5 +1193,3 @@
   </script>
 </body>
 </html>
-
-
