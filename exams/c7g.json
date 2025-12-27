@@ -1,0 +1,317 @@
+{
+  "examName": "genesis-c7",
+  "duration": 35,
+  "totalQuestions": 31,
+  "questions": [
+    {
+      "question": "Who created the heavens and the earth? / ఆకాశాలను మరియు భూమిని సృష్టించింది ఎవరు?",
+      "options": [
+        "Adam / ఆదాము",
+        "Angels / దేవదూతలు",
+        "God / దేవుడు",
+        "Moses / మోషే"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "On which day did God create man? / దేవుడు మానవుడిని ఏ రోజున సృష్టించాడు?",
+      "options": [
+        "Fourth / నాలుగవ",
+        "Fifth / ఐదవ",
+        "Sixth / ఆరవ",
+        "Seventh / ఏడవ"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What did God do on the seventh day? / ఏడవ రోజున దేవుడు ఏమి చేశాడు?",
+      "options": [
+        "Created animals / జంతువులను సృష్టించాడు",
+        "Rested / విశ్రాంతి తీసుకున్నాడు",
+        "Destroyed evil / చెడును నాశనం చేశాడు",
+        "Created light / వెలుగును సృష్టించాడు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Humans are created in the image of God mainly to: / మానవులు దేవుని స్వరూపంలో సృష్టించబడ్డారు ప్రధానంగా:",
+      "options": [
+        "Look like God physically / దేవుడు శారీరకంగా కనిపించేలా",
+        "Rule animals only / జంతువులను మాత్రమే పాలించడానికి",
+        "Reflect God's character / దేవుని స్వభావాన్ని ప్రతిబింబించడానికి",
+        "Live without rules / నియమాలు లేకుండా జీవించడానికి"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Who tempted Eve to eat the forbidden fruit? / నిషేధించబడిన పండ్లను తినమని హవ్వను ప్రలోభపెట్టినది ఎవరు?",
+      "options": [
+        "Adam / ఆదాము",
+        "Angel / దేవదూత",
+        "Serpent / సర్పం",
+        "Cain / కయీను"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "After Adam and Eve sinned, what did they do? / ఆదాము మరియు హవ్వ పాపం చేసిన తర్వాత వారు ఏమి చేశారు?",
+      "options": [
+        "Celebrated / జరుపుకున్నారు",
+        "Hid from God / దేవుని నుండి దాగిపోయారు",
+        "Became kings / రాజులయ్యారు",
+        "Went to heaven / స్వర్గానికి వెళ్ళారు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "In Genesis 3:15, God promised that: / ఆదికాండము 3:15లో, దేవుడు వాగ్దానం చేశాడు:",
+      "options": [
+        "Humans would never sin / మానవులు ఎన్నడూ పాపం చేయరు",
+        "Evil would be defeated / చెడు ఓడించబడుతుంది",
+        "The garden would return / తోట తిరిగి వస్తుంది",
+        "Death would stop immediately / మరణం వెంటనే ఆగిపోతుంది"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What was Abel's occupation? / హేబెలు వృత్తి ఏమిటి?",
+      "options": [
+        "Farmer / రైతు",
+        "Shepherd / గొర్రెల కాపరి",
+        "Builder / నిర్మాణకర్త",
+        "King / రాజు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Why was Cain angry with Abel? / కయీను హేబెలుపై ఎందుకు కోపగించాడు?",
+      "options": [
+        "Abel mocked him / హేబెలు అతనిని అపహాస్యం చేశాడు",
+        "God accepted Abel's offering / దేవుడు హేబెలు అర్పణను అంగీకరించాడు",
+        "Abel took his land / హేబెలు అతని భూమిని తీసుకున్నాడు",
+        "God punished Cain / దేవుడు కయీనును శిక్షించాడు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What sin led Cain to kill Abel? / కయీను హేబెలును చంపడానికి ఏ పాపం దారితీసింది?",
+      "options": [
+        "Fear / భయం",
+        "Jealousy / అసూయ",
+        "Laziness / సోమరితనం",
+        "Ignorance / అజ్ఞానం"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which statement shows how sin increased after the Fall? / పతనం తర్వాత పాపం ఎలా పెరిగిందో చూపించే వాక్యం ఏది?",
+      "options": [
+        "People lived longer / ప్రజలు ఎక్కువ కాలం జీవించారు",
+        "Cain killed Abel and the earth became corrupt / కయీను హేబెలును చంపాడు మరియు భూమి భ్రష్టమైంది",
+        "Everyone obeyed God / అందరూ దేవుని విధేయత చూపారు",
+        "Wisdom increased everywhere / జ్ఞానం ప్రతిచోటా పెరిగింది"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Who walked with God and was taken by Him? / దేవునితో నడిచి, ఆయన చేత తీసుకోబడినవాడు ఎవరు?",
+      "options": [
+        "Noah / నోవహు",
+        "Seth / షేతు",
+        "Enoch / హనోకు",
+        "Lamech / లెమెకు"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Why did God decide to send the flood? / దేవుడు జలప్రళయాన్ని పంపాలని ఎందుకు నిర్ణయించుకున్నాడు?",
+      "options": [
+        "No rain / వర్షం లేదు",
+        "Earth was old / భూమి పాతది",
+        "People were very wicked / ప్రజలు చాలా దుర్మార్గులు",
+        "Noah requested it / నోవహు అడిగాడు"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "How many days and nights did it rain? / ఎన్ని రోజులు మరియు రాత్రులు వర్షం కురిసింది?",
+      "options": [
+        "20 / ఇరవై",
+        "30 / ముప్పై",
+        "40 / నలభై",
+        "100 / వంద"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Who found favor in God's eyes? / దేవుని దృష్టిలో కృపను పొందినవాడు ఎవరు?",
+      "options": [
+        "Adam / ఆదాము",
+        "Noah / నోవహు",
+        "Cain / కయీను",
+        "Lot / లోతు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What sign did God give as a promise after the flood? / జలప్రళయం తర్వాత దేవుడు వాగ్దానంగా ఏ గుర్తును ఇచ్చాడు?",
+      "options": [
+        "Fire / అగ్ని",
+        "Star / నక్షత్రం",
+        "Rainbow / ఇంద్రధనస్సు",
+        "Cloud / మేఘం"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Why did people build the Tower of Babel? / ప్రజలు బాబెల్ గోపురాన్ని ఎందుకు నిర్మించారు?",
+      "options": [
+        "To worship God / దేవుని ఆరాధించడానికి",
+        "To reach heaven by their own strength / తమ సొంత శక్తితో స్వర్గాన్ని చేరుకోవడానికి",
+        "To escape enemies / శత్రువుల నుండి తప్పించుకోవడానికి",
+        "To store food / ఆహారాన్ని నిల్వ చేయడానికి"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "How did God stop their plan? / దేవుడు వారి ప్రణాళికను ఎలా ఆపాడు?",
+      "options": [
+        "Sent fire / అగ్ని పంపాడు",
+        "Flooded the land / భూమిని ముంచెత్తాడు",
+        "Confused their languages / వారి భాషలను గందరగోళపరిచాడు",
+        "Destroyed the tower immediately / గోపురాన్ని వెంటనే నాశనం చేశాడు"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Where did God call Abraham to go? / దేవుడు అబ్రాహాముకు ఎక్కడికి వెళ్ళమని పిలిచాడు?",
+      "options": [
+        "Egypt / ఈజిప్టు",
+        "Babylon / బబులోను",
+        "A land God would show him / దేవుడు అతనికి చూపించే దేశం",
+        "Jerusalem / యెరూషలేము"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "How did Abraham respond to God's call? / దేవుని పిలుపుకు అబ్రాహాము ఎలా స్పందించాడు?",
+      "options": [
+        "He refused / అతను నిరాకరించాడు",
+        "He delayed / అతను ఆలస్యం చేశాడు",
+        "He obeyed / అతను విధేయత చూపాడు",
+        "He argued / అతను వాదించాడు"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What lie did Abraham say about Sarah? / సారా గురించి అబ్రాహాము చెప్పిన అబద్ధం ఏమిటి?",
+      "options": [
+        "She was his servant / ఆమె అతని సేవకురాలు",
+        "She was his sister / ఆమె అతని సోదరి",
+        "She was his cousin / ఆమె అతని బంధువురాలు",
+        "She was not with him / ఆమె అతనితో లేదు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Why did Abraham and Lot separate? / అబ్రాహాము మరియు లోతు ఎందుకు విడిపోయారు?",
+      "options": [
+        "God commanded it / దేవుడు ఆజ్ఞాపించాడు",
+        "Their servants quarreled / వారి సేవకులు గొడవపడ్డారు",
+        "War broke out / యుద్ధం మొదలైంది",
+        "Lot wanted Egypt / లోతు ఈజిప్టును కోరుకున్నాడు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Who rescued Lot from the kings? / రాజుల నుండి లోతును ఎవరు రక్షించారు?",
+      "options": [
+        "Isaac / ఇస్సాకు",
+        "Pharaoh / ఫరో",
+        "Abraham / అబ్రాహాము",
+        "King of Sodom / సొదొమ రాజు"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Who blessed Abraham after the rescue? / రక్షణ తర్వాత అబ్రాహామును ఎవరు ఆశీర్వదించారు?",
+      "options": [
+        "Noah / నోవహు",
+        "Melchizedek / మెల్కీసెదెకు",
+        "Lot / లోతు",
+        "Pharaoh / ఫరో"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Abraham was counted righteous because he: / అబ్రాహాము నీతిమంతుడుగా లెక్కించబడ్డాడు ఎందుకంటే అతను:",
+      "options": [
+        "Offered sacrifices / బలులు అర్పించాడు",
+        "Obeyed perfectly / సంపూర్ణంగా విధేయత చూపాడు",
+        "Believed God / దేవునిని విశ్వసించాడు",
+        "Was wealthy / ధనవంతుడు"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Who was Ishmael's mother? / ఇష్మాయేలు తల్లి ఎవరు?",
+      "options": [
+        "Sarah / సారా",
+        "Rebekah / రిబ్కా",
+        "Hagar / హాగారు",
+        "Leah / లేయా"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Why was Isaac chosen for God's covenant? / దేవుని నిబంధన కోసం ఇస్సాకు ఎందుకు ఎంపిక చేయబడ్డాడు?",
+      "options": [
+        "He was older / అతను పెద్దవాడు",
+        "He was stronger / అతను బలవంతుడు",
+        "God promised through him / దేవుడు అతని ద్వారా వాగ్దానం చేశాడు",
+        "Sarah demanded it / సారా డిమాండ్ చేసింది"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What does Isaac's birth teach us? / ఇస్సాకు పుట్టుక మనకు ఏమి నేర్పుతుంది?",
+      "options": [
+        "Humans control blessings / మానవులు ఆశీర్వాదాలను నియంత్రిస్తారు",
+        "God's timing is perfect / దేవుని సమయం పరిపూర్ణం",
+        "Age does not matter / వయస్సు ముఖ్యం కాదు",
+        "Faith removes all waiting / విశ్వాసం అన్ని నిరీక్షణలను తొలగిస్తుంది"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Why were Sodom and Gomorrah destroyed? / సొదొమ మరియు గొమొర్రా ఎందుకు నాశనం చేయబడ్డాయి?",
+      "options": [
+        "Poverty / పేదరికం",
+        "War / యుద్ధం",
+        "Great wickedness / గొప్ప దుర్మార్గత",
+        "Flood / జలప్రళయం"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What did Abraham do before their destruction? / వాటి నాశనానికి ముందు అబ్రాహాము ఏమి చేశాడు?",
+      "options": [
+        "Ignored God / దేవుని నిర్లక్ష్యం చేశాడు",
+        "Ran away / పారిపోయాడు",
+        "Prayed for them / వారి కోసం ప్రార్థించాడు",
+        "Joined them / వారితో చేరాడు"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What does Abraham's prayer teach us? / అబ్రాహాము ప్రార్థన మనకు ఏమి నేర్పుతుంది?",
+      "options": [
+        "God ignores prayer / దేవుడు ప్రార్థనను నిర్లక్ష్యం చేస్తాడు",
+        "Only judgment matters / తీర్పు మాత్రమే ముఖ్యం",
+        "God listens to righteous intercession / దేవుడు నీతిమంతుల మధ్యవర్తిత్వాన్ని వింటాడు",
+        "Prayer is only personal / ప్రార్థన వ్యక్తిగతమైనది మాత్రమే"
+      ],
+      "correct": 2
+    }
+  ]
+}

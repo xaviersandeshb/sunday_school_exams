@@ -1,0 +1,187 @@
+{
+  "examName": "genesis-c5",
+  "duration": 22,
+  "totalQuestions": 18,
+  "questions": [
+    {
+      "question": "Who created the heavens and the earth? / ఆకాశాలను మరియు భూమిని సృష్టించింది ఎవరు?",
+      "options": [
+        "Adam / ఆదాము",
+        "Angels / దేవదూతలు",
+        "God / దేవుడు",
+        "Moses / మోషే"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "On which day did God create man? / దేవుడు మానవుడిని ఏ రోజున సృష్టించాడు?",
+      "options": [
+        "Fourth / నాలుగవ",
+        "Fifth / ఐదవ",
+        "Sixth / ఆరవ",
+        "Seventh / ఏడవ"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "What did God do on the seventh day? / ఏడవ రోజున దేవుడు ఏమి చేశాడు?",
+      "options": [
+        "Created animals / జంతువులను సృష్టించాడు",
+        "Rested / విశ్రాంతి తీసుకున్నాడు",
+        "Destroyed evil / చెడును నాశనం చేశాడు",
+        "Created light / వెలుగును సృష్టించాడు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Humans are created in the image of God mainly to: / మానవులు దేవుని స్వరూపంలో సృష్టించబడ్డారు ప్రధానంగా:",
+      "options": [
+        "Look like God physically / దేవుడు శారీరకంగా కనిపించేలా",
+        "Rule animals only / జంతువులను మాత్రమే పాలించడానికి",
+        "Reflect God's character / దేవుని స్వభావాన్ని ప్రతిబింబించడానికి",
+        "Live without rules / నియమాలు లేకుండా జీవించడానికి"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Who tempted Eve to eat the forbidden fruit? / నిషేధించబడిన పండ్లను తినమని హవ్వను ప్రలోభపెట్టినది ఎవరు?",
+      "options": [
+        "Adam / ఆదాము",
+        "Angel / దేవదూత",
+        "Serpent / సర్పం",
+        "Cain / కయీను"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "After Adam and Eve sinned, what did they do? / ఆదాము మరియు హవ్వ పాపం చేసిన తర్వాత వారు ఏమి చేశారు?",
+      "options": [
+        "Celebrated / జరుపుకున్నారు",
+        "Hid from God / దేవుని నుండి దాగిపోయారు",
+        "Became kings / రాజులయ్యారు",
+        "Went to heaven / స్వర్గానికి వెళ్ళారు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "In Genesis 3:15, God promised that: / ఆదికాండము 3:15లో, దేవుడు వాగ్దానం చేశాడు:",
+      "options": [
+        "Humans would never sin / మానవులు ఎన్నడూ పాపం చేయరు",
+        "Evil would be defeated / చెడు ఓడించబడుతుంది",
+        "The garden would return / తోట తిరిగి వస్తుంది",
+        "Death would stop immediately / మరణం వెంటనే ఆగిపోతుంది"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What was Abel's occupation? / హేబెలు వృత్తి ఏమిటి?",
+      "options": [
+        "Farmer / రైతు",
+        "Shepherd / గొర్రెల కాపరి",
+        "Builder / నిర్మాణకర్త",
+        "King / రాజు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Why was Cain angry with Abel? / కయీను హేబెలుపై ఎందుకు కోపగించాడు?",
+      "options": [
+        "Abel mocked him / హేబెలు అతనిని అపహాస్యం చేశాడు",
+        "God accepted Abel's offering / దేవుడు హేబెలు అర్పణను అంగీకరించాడు",
+        "Abel took his land / హేబెలు అతని భూమిని తీసుకున్నాడు",
+        "God punished Cain / దేవుడు కయీనును శిక్షించాడు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What sin led Cain to kill Abel? / కయీను హేబెలును చంపడానికి ఏ పాపం దారితీసింది?",
+      "options": [
+        "Fear / భయం",
+        "Jealousy / అసూయ",
+        "Laziness / సోమరితనం",
+        "Ignorance / అజ్ఞానం"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Which statement shows how sin increased after the Fall? / పతనం తర్వాత పాపం ఎలా పెరిగిందో చూపించే వాక్యం ఏది?",
+      "options": [
+        "People lived longer / ప్రజలు ఎక్కువ కాలం జీవించారు",
+        "Cain killed Abel and the earth became corrupt / కయీను హేబెలును చంపాడు మరియు భూమి భ్రష్టమైంది",
+        "Everyone obeyed God / అందరూ దేవుని విధేయత చూపారు",
+        "Wisdom increased everywhere / జ్ఞానం ప్రతిచోటా పెరిగింది"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "Who walked with God and was taken by Him? / దేవునితో నడిచి, ఆయన చేత తీసుకోబడినవాడు ఎవరు?",
+      "options": [
+        "Noah / నోవహు",
+        "Seth / షేతు",
+        "Enoch / హనోకు",
+        "Lamech / లెమెకు"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Why did God decide to send the flood? / దేవుడు జలప్రళయాన్ని పంపాలని ఎందుకు నిర్ణయించుకున్నాడు?",
+      "options": [
+        "No rain / వర్షం లేదు",
+        "Earth was old / భూమి పాతది",
+        "People were very wicked / ప్రజలు చాలా దుర్మార్గులు",
+        "Noah requested it / నోవహు అడిగాడు"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "How many days and nights did it rain? / ఎన్ని రోజులు మరియు రాత్రులు వర్షం కురిసింది?",
+      "options": [
+        "20 / ఇరవై",
+        "30 / ముప్పై",
+        "40 / నలభై",
+        "100 / వంద"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Who found favor in God's eyes? / దేవుని దృష్టిలో కృపను పొందినవాడు ఎవరు?",
+      "options": [
+        "Adam / ఆదాము",
+        "Noah / నోవహు",
+        "Cain / కయీను",
+        "Lot / లోతు"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "What sign did God give as a promise after the flood? / జలప్రళయం తర్వాత దేవుడు వాగ్దానంగా ఏ గుర్తును ఇచ్చాడు?",
+      "options": [
+        "Fire / అగ్ని",
+        "Star / నక్షత్రం",
+        "Rainbow / ఇంద్రధనస్సు",
+        "Cloud / మేఘం"
+      ],
+      "correct": 2
+    },
+    {
+      "question": "Why did people build the Tower of Babel? / ప్రజలు బాబెల్ గోపురాన్ని ఎందుకు నిర్మించారు?",
+      "options": [
+        "To worship God / దేవుని ఆరాధించడానికి",
+        "To reach heaven by their own strength / తమ సొంత శక్తితో స్వర్గాన్ని చేరుకోవడానికి",
+        "To escape enemies / శత్రువుల నుండి తప్పించుకోవడానికి",
+        "To store food / ఆహారాన్ని నిల్వ చేయడానికి"
+      ],
+      "correct": 1
+    },
+    {
+      "question": "How did God stop their plan? / దేవుడు వారి ప్రణాళికను ఎలా ఆపాడు?",
+      "options": [
+        "Sent fire / అగ్ని పంపాడు",
+        "Flooded the land / భూమిని ముంచెత్తాడు",
+        "Confused their languages / వారి భాషలను గందరగోళపరిచాడు",
+        "Destroyed the tower immediately / గోపురాన్ని వెంటనే నాశనం చేశాడు"
+      ],
+      "correct": 2
+    }
+  ]
+}
